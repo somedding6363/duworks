@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build && node scripts/generate-security-headers.mjs",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "headers:check": "node scripts/generate-security-headers.mjs --check"
