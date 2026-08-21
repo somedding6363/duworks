@@ -8,7 +8,10 @@ const checkOnly = process.argv.includes("--check");
 const cloudflareHeaderLineLimit = 2_000;
 
 const externalSources = {
-  analytics: ["https://www.google-analytics.com", "https://*.google-analytics.com"],
+  analytics: {
+    connect: ["https://*.google-analytics.com", "https://*.analytics.google.com"],
+    image: ["https://*.google-analytics.com"],
+  },
   tagManager: "https://www.googletagmanager.com",
 };
 
@@ -40,17 +43,18 @@ function getInlineScriptHashes(html) {
 }
 
 function createContentSecurityPolicy(scriptHashes) {
-  const analyticsSources = externalSources.analytics.join(" ");
+  const analyticsConnectSources = externalSources.analytics.connect.join(" ");
+  const analyticsImageSources = externalSources.analytics.image.join(" ");
 
   return [
     "default-src 'self'",
     "base-uri 'self'",
-    `connect-src 'self' ${analyticsSources} ${externalSources.tagManager}`,
+    `connect-src 'self' ${analyticsConnectSources} ${externalSources.tagManager}`,
     "font-src 'self' data:",
     "form-action 'self'",
     "frame-ancestors 'none'",
     `frame-src ${externalSources.tagManager}`,
-    `img-src 'self' data: blob: ${analyticsSources} ${externalSources.tagManager}`,
+    `img-src 'self' data: blob: ${analyticsImageSources} ${externalSources.tagManager}`,
     "manifest-src 'self'",
     "media-src 'self'",
     "object-src 'none'",

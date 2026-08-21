@@ -118,8 +118,16 @@ test("authorizes every exported inline script with a bounded hash-based CSP", as
 
   const policy = policyLine.trim();
   const scriptSource = policy.match(/script-src ([^;]+)/)?.[1] ?? "";
+  const connectSource = policy.match(/connect-src ([^;]+)/)?.[1] ?? "";
+  const imageSource = policy.match(/img-src ([^;]+)/)?.[1] ?? "";
   assert.doesNotMatch(scriptSource, /'unsafe-inline'/);
   assert.match(scriptSource, /https:\/\/www\.googletagmanager\.com/);
+  assert.match(connectSource, /https:\/\/\*\.google-analytics\.com/);
+  assert.match(connectSource, /https:\/\/\*\.analytics\.google\.com/);
+  assert.match(connectSource, /https:\/\/www\.googletagmanager\.com/);
+  assert.match(imageSource, /https:\/\/\*\.google-analytics\.com/);
+  assert.doesNotMatch(imageSource, /https:\/\/\*\.analytics\.google\.com/);
+  assert.match(imageSource, /https:\/\/www\.googletagmanager\.com/);
 
   const inlineHashes = new Set();
   const htmlFiles = collectFiles(outputRoot).filter((file) => file.endsWith(".html"));
