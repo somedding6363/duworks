@@ -55,6 +55,7 @@ test("publishes canonical SEO metadata and WebSite structured data", () => {
   assert.equal(structuredData["@context"], "https://schema.org");
   assert.equal(structuredData["@type"], "WebSite");
   assert.equal(structuredData.name, "DUWORKS");
+  assert.deepEqual(structuredData.alternateName, ["두웍스", "duworks.kr"]);
   assert.equal(structuredData.url, siteUrl);
   assert.equal(structuredData.inLanguage, "ko-KR");
 });
