@@ -2,8 +2,10 @@
 
 import { useRef } from "react";
 import { ArrowUpIcon, ArrowUpRightIcon } from "@/shared/icons";
-import { gsap, useGSAP } from "@/shared/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { ScrollButton } from "@/shared/ui";
+
+const touchScrubDuration = 0.2;
 
 export function MoreToComeSection() {
   const section = useRef<HTMLElement>(null);
@@ -36,7 +38,7 @@ export function MoreToComeSection() {
             trigger: section.current,
             start: "top 50%",
             end: "bottom bottom",
-            scrub: true,
+            scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
             invalidateOnRefresh: true,
           },
         });
