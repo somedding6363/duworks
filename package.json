@@ -6,10 +6,12 @@
     "dev": "next dev",
     "build": "next build && node scripts/generate-security-headers.mjs",
     "lint": "eslint .",
+    "test": "npm run build && node --test tests/*.test.mjs",
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "headers:check": "node scripts/generate-security-headers.mjs --check"
+    "headers:check": "node scripts/generate-security-headers.mjs --check",
+    "verify": "npm run format:check && npm run typecheck && npm run lint && npm test"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",

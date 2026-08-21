@@ -32,8 +32,5 @@ next-env.d.ts
 /CLAUDE.md
 /DESIGN.md
 
-# local tests
-/tests/
-
 # local design explorations
 /design/
