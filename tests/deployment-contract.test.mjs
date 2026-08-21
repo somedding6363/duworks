@@ -8,6 +8,8 @@ import test from "node:test";
 import { collectFiles, getAttribute, outputRoot, readOutput } from "./test-utils.mjs";
 
 const siteUrl = "https://duworks.kr/";
+const siteTitle = "DUWORKS";
+const siteDescription = "DUWORKS는 상상을 현실로 옮기고 그 결과를 세상에 내놓습니다.";
 const tagManagerId = "GTM-NQHQ5GRM";
 
 test("exports every file required by the static deployment", () => {
@@ -34,11 +36,15 @@ test("publishes canonical SEO metadata and WebSite structured data", () => {
     tags.find((tag) => getAttribute(tag, attribute) === value) ?? "";
 
   assert.equal(getAttribute(htmlTag, "lang"), "ko");
+  assert.equal(html.match(/<title>(.*?)<\/title>/i)?.[1], siteTitle);
   assert.equal(getAttribute(findTag("rel", "canonical"), "href"), siteUrl);
+  assert.equal(getAttribute(findTag("name", "description"), "content"), siteDescription);
   assert.equal(getAttribute(findTag("property", "og:url"), "content"), siteUrl);
-  assert.ok(getAttribute(findTag("property", "og:title"), "content"));
-  assert.ok(getAttribute(findTag("property", "og:description"), "content"));
+  assert.equal(getAttribute(findTag("property", "og:title"), "content"), siteTitle);
+  assert.equal(getAttribute(findTag("property", "og:description"), "content"), siteDescription);
   assert.equal(getAttribute(findTag("name", "twitter:card"), "content"), "summary_large_image");
+  assert.equal(getAttribute(findTag("name", "twitter:title"), "content"), siteTitle);
+  assert.equal(getAttribute(findTag("name", "twitter:description"), "content"), siteDescription);
 
   const structuredDataMatch = html.match(
     /<script type="application\/ld\+json">([\s\S]*?)<\/script>/i,
