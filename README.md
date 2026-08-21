@@ -57,10 +57,21 @@ npm run build
 
 Firebase Hosting을 선택하면 초기화 시 public directory를 `out`으로 지정하면 됩니다. 실제 프로젝트 연결 전에는 Firebase 설정 파일을 저장소에 고정하지 않습니다.
 
+### Cloudflare Pages 보안 헤더
+
+`public/_headers`에는 HSTS, clickjacking 방어, MIME sniffing 방지, Referrer Policy, Permissions Policy가 정의되어 있습니다. `npm run build`는 정적 HTML의 인라인 스크립트 SHA-256 해시를 계산해 `out/_headers`에 CSP를 추가합니다. 이를 통해 Next.js hydration과 Google Tag Manager를 허용하면서 `script-src 'unsafe-inline'`은 사용하지 않습니다.
+
+배포 전 생성 결과는 다음 명령으로 다시 확인할 수 있습니다.
+
+```bash
+npm run headers:check
+```
+
 ## 검증
 
 ```bash
 npm run typecheck
 npm run lint
 npm run build
+npm run headers:check
 ```
