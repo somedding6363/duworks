@@ -7,6 +7,7 @@ import { ServiceCard } from "./service-card";
 
 const morphViewportRatio = 1;
 const minimumServiceHeight = 400;
+const touchScrubDuration = 0.2;
 
 type StageMetrics = {
   cardHeight: number;
@@ -37,6 +38,7 @@ export function ServicesSection() {
         const clamp = gsap.utils.clamp(0, 1);
         const interpolate = gsap.utils.interpolate;
         const morphEase = gsap.parseEase("power2.inOut");
+        const progressState = { value: 0 };
         let metrics: StageMetrics;
 
         const measure = () => {
@@ -190,18 +192,26 @@ export function ServicesSection() {
         measure();
         render(0);
 
+        const progressAnimation = gsap.to(progressState, {
+          value: 1,
+          duration: 1,
+          paused: true,
+          ease: "none",
+          onUpdate: () => render(progressState.value),
+        });
+
         const trigger = ScrollTrigger.create({
+          animation: progressAnimation,
           trigger: sectionElement,
           start: "top top",
           end: () => "+=" + getScrollDistances().totalScrollDistance,
           pin: stageElement,
-          scrub: true,
+          scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          onUpdate: (self) => render(self.progress),
-          onRefresh: (self) => {
+          onRefresh: () => {
             measure();
-            render(self.progress);
+            render(progressState.value);
           },
         });
 
@@ -220,15 +230,10 @@ export function ServicesSection() {
           return () => card.removeEventListener("click", moveToCard);
         });
 
-        const refresh = () => ScrollTrigger.refresh();
-        window.addEventListener("resize", refresh);
-        window.addEventListener("load", refresh);
-
         return () => {
-          window.removeEventListener("resize", refresh);
-          window.removeEventListener("load", refresh);
           cardClickCleanups.forEach((cleanup) => cleanup());
           trigger.kill();
+          progressAnimation.kill();
         };
       });
 

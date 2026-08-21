@@ -2,11 +2,12 @@
 
 import { useRef } from "react";
 import { liveServices } from "@/entities/service";
-import { gsap, useGSAP } from "@/shared/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { ScrollButton } from "@/shared/ui";
 import { HeroOrbit } from "./hero-orbit";
 
 const WORDMARK = "DUWORKS";
+const touchScrubDuration = 0.2;
 
 export function HeroSection() {
   const section = useRef<HTMLElement>(null);
@@ -76,7 +77,7 @@ export function HeroSection() {
             trigger: section.current,
             start: "top top",
             end: "bottom top",
-            scrub: true,
+            scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
           },
         });
 
@@ -87,7 +88,7 @@ export function HeroSection() {
             trigger: section.current,
             start: "top top",
             end: "bottom top",
-            scrub: true,
+            scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
           },
         });
       });
