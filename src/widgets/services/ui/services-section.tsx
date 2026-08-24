@@ -7,6 +7,7 @@ import {
   liveServices,
   ServiceFanCard,
   serviceFanCardTransitionDuration,
+  serviceFanCollapsedOpacity,
 } from "@/entities/service";
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { ServiceCard } from "./service-card";
@@ -174,6 +175,7 @@ export function ServicesSection() {
           y: 0,
           rotation: 0,
           rotationY: 0,
+          opacity: serviceFanCollapsedOpacity,
           scaleX: 1,
           scaleY: 1,
           transformOrigin: "50% 100%",
@@ -230,12 +232,21 @@ export function ServicesSection() {
         fanCards.forEach((card, index) => {
           entryTimeline.fromTo(
             card,
-            { x: 0, y: 0, rotation: 0, rotationY: 0, scaleX: 1, scaleY: 1 },
+            {
+              x: 0,
+              y: 0,
+              rotation: 0,
+              rotationY: 0,
+              opacity: serviceFanCollapsedOpacity,
+              scaleX: 1,
+              scaleY: 1,
+            },
             {
               x: () => getFanTransform(index).x,
               y: () => getFanTransform(index).y,
               rotation: () => getFanTransform(index).rotation,
               rotationY: 0,
+              opacity: 1,
               scaleX: 1,
               scaleY: 1,
               duration: serviceFanCardTransitionDuration,

@@ -1,4 +1,5 @@
 export const serviceFanCardTransitionDuration = 0.58;
+export const serviceFanCollapsedOpacity = 0.2;
 
 export function getServiceFanTravel(viewportHeight: number) {
   return Math.min(viewportHeight * 0.34, 260);

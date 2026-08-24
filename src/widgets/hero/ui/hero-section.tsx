@@ -6,6 +6,7 @@ import {
   getServiceFanTravel,
   liveServices,
   serviceFanCardTransitionDuration,
+  serviceFanCollapsedOpacity,
 } from "@/entities/service";
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { HeroOrbit } from "./hero-orbit";
@@ -122,6 +123,7 @@ export function HeroSection() {
               x: 0,
               y: 0,
               rotation: 0,
+              opacity: serviceFanCollapsedOpacity,
               duration: serviceFanCardTransitionDuration,
               ease: "power2.inOut",
             },
