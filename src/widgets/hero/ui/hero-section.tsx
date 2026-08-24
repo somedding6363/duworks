@@ -123,6 +123,14 @@ export function HeroSection() {
               x: 0,
               y: 0,
               rotation: 0,
+              duration: serviceFanCardTransitionDuration,
+              ease: "power2.inOut",
+            },
+            0,
+          )
+          .to(
+            fanElement,
+            {
               opacity: serviceFanCollapsedOpacity,
               duration: serviceFanCardTransitionDuration,
               ease: "power2.inOut",
