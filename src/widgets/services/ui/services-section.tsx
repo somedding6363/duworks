@@ -403,7 +403,7 @@ export function ServicesSection() {
     <section
       ref={section}
       id="services"
-      className="relative z-0 isolate scroll-mt-0 bg-paper text-ink"
+      className="relative z-0 isolate scroll-mt-0 bg-white text-ink"
       aria-labelledby="services-title"
     >
       <div

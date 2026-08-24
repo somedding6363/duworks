@@ -4,7 +4,7 @@ import { ArrowUpRightIcon, BrandHorizontalLogo } from "@/shared/icons";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-ink/8 bg-paper py-12">
+    <footer className="bg-paper py-12">
       <div className="page-shell">
         <Image src={BrandHorizontalLogo} alt="DUWORKS" className="h-8 w-auto" />
 
