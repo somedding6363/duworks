@@ -24,10 +24,8 @@ export function ServiceFanCard({
 }: ServiceFanCardProps) {
   return (
     <article
-      data-fan-card
       data-hero-card={scope === "hero" ? "" : undefined}
       data-service-entry-card={scope === "service" ? "" : undefined}
-      data-index={index}
       className="absolute bottom-0 left-0 ml-[clamp(-5.75rem,-19vw,-5rem)] aspect-[4/5] w-[clamp(10rem,38vw,11.5rem)] overflow-hidden rounded-[clamp(1rem,1.8vw,1.5rem)] bg-panel shadow-[0_1.5rem_4.5rem_rgb(23_23_19/0.2)] will-change-[transform,opacity] [backface-visibility:hidden] md:ml-[clamp(-7.75rem,-9vw,-5.75rem)] md:w-[clamp(11.5rem,18vw,15.5rem)]"
       style={{ zIndex: total - Math.abs(index - (total - 1) / 2) }}
     >
