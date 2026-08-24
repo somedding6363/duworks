@@ -1,10 +1,15 @@
 "use client";
 
 import { useRef } from "react";
-import { liveServices } from "@/entities/service";
+import {
+  getServiceFanCardTransform,
+  getServiceFanTravel,
+  liveServices,
+  serviceFanCardTransitionDuration,
+} from "@/entities/service";
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
-import { ScrollButton } from "@/shared/ui";
 import { HeroOrbit } from "./hero-orbit";
+import { HeroServiceFan } from "./hero-service-fan";
 
 const WORDMARK = "DUWORKS";
 const touchScrubDuration = 0.2;
@@ -17,6 +22,27 @@ export function HeroSection() {
       const media = gsap.matchMedia();
 
       media.add("(prefers-reduced-motion: no-preference)", () => {
+        const heroCards = gsap.utils.toArray<HTMLElement>("[data-hero-card]");
+
+        const layoutFan = () => {
+          const width = section.current?.clientWidth ?? window.innerWidth;
+
+          heroCards.forEach((card, index) => {
+            const transform = getServiceFanCardTransform(index, heroCards.length, width);
+            gsap.set(card, {
+              x: transform.x,
+              y: transform.y,
+              rotation: transform.rotation,
+              transformOrigin: "50% 100%",
+              force3D: true,
+            });
+          });
+        };
+
+        layoutFan();
+        const resizeObserver = new ResizeObserver(layoutFan);
+        if (section.current) resizeObserver.observe(section.current);
+
         const timeline = gsap.timeline({ defaults: { ease: "power4.out" } });
 
         timeline
@@ -42,31 +68,10 @@ export function HeroSection() {
           )
           .from('[data-hero="support"]', { y: 24, autoAlpha: 0, duration: 0.8 }, "-=0.68")
           .from(
-            '[data-hero="service-label"]',
-            { y: 14, scale: 0.84, autoAlpha: 0, stagger: 0.08, duration: 0.7 },
+            heroCards,
+            { yPercent: 42, scale: 0.88, autoAlpha: 0, stagger: 0.07, duration: 0.9 },
             "-=0.58",
-          )
-          .from('[data-hero="scroll-cue"]', { autoAlpha: 0, duration: 0.5 }, "-=0.2");
-
-        gsap.to('[data-hero="scroll-cue"]', {
-          y: 7,
-          duration: 0.85,
-          delay: 2.4,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        });
-
-        gsap.utils.toArray<HTMLElement>('[data-hero="service-label"]').forEach((label, index) => {
-          gsap.to(label, {
-            y: index % 2 === 0 ? 7 : -7,
-            duration: 4.2 + index * 0.45,
-            delay: 1.5 + index * 0.08,
-            yoyo: true,
-            repeat: -1,
-            ease: "sine.inOut",
-          });
-        });
+          );
 
         gsap.to('[data-hero="copy"]', {
           yPercent: 9,
@@ -91,6 +96,53 @@ export function HeroSection() {
             scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
           },
         });
+
+        return () => resizeObserver.disconnect();
+      });
+
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        const fanElement = section.current?.querySelector<HTMLElement>('[data-hero="service-fan"]');
+        if (!fanElement) return;
+
+        const heroCards = gsap.utils.toArray<HTMLElement>("[data-hero-card]");
+        const exit = gsap.timeline({
+          scrollTrigger: {
+            trigger: section.current,
+            start: "bottom bottom",
+            end: "bottom top",
+            scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        exit
+          .to(
+            heroCards,
+            {
+              x: 0,
+              y: 0,
+              rotation: 0,
+              duration: serviceFanCardTransitionDuration,
+              ease: "power2.inOut",
+            },
+            0,
+          )
+          .to(
+            fanElement,
+            {
+              y: () => getServiceFanTravel(window.innerHeight),
+              scale: 0.92,
+              duration: 1,
+              ease: "none",
+            },
+            0,
+          )
+          .to(fanElement, { autoAlpha: 0, duration: 0.22, ease: "none" }, 0.78);
+
+        return () => {
+          exit.scrollTrigger?.kill();
+          exit.kill();
+        };
       });
 
       media.add("(prefers-reduced-motion: no-preference) and (min-width: 48rem)", () => {
@@ -112,10 +164,11 @@ export function HeroSection() {
     <section
       ref={section}
       data-hero="scene"
-      className="relative grid min-h-[max(100svh,25rem)] place-items-center overflow-hidden bg-paper px-[var(--page-gutter)] pt-16 pb-24 md:pt-20 md:pb-[6.5rem]"
+      className="relative z-0 isolate grid min-h-[max(100svh,44rem)] place-items-center overflow-hidden bg-paper px-[var(--page-gutter)] pt-16 pb-24 md:pt-20 md:pb-[6.5rem]"
       aria-labelledby="hero-title"
     >
       <HeroOrbit services={liveServices} />
+      <HeroServiceFan services={liveServices} />
 
       <div
         data-hero="copy"
@@ -156,22 +209,6 @@ export function HeroSection() {
           <span className="block">그 결과를 세상에 내놓습니다.</span>
         </p>
       </div>
-
-      <ScrollButton
-        data-hero="scroll-cue"
-        targetId="service-index"
-        className="absolute bottom-20 left-1/2 z-[5] flex -translate-x-1/2 cursor-pointer items-center whitespace-nowrap text-scroll-cue font-utility text-muted md:bottom-7"
-      >
-        <span
-          className="mr-3 h-px w-10 bg-linear-to-l from-ink to-transparent"
-          aria-hidden="true"
-        />
-        <span>SCROLL TO EXPLORE</span>
-        <span
-          className="ml-3 h-px w-10 bg-linear-to-r from-ink to-transparent"
-          aria-hidden="true"
-        />
-      </ScrollButton>
     </section>
   );
 }

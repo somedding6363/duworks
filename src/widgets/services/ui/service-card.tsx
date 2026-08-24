@@ -7,68 +7,37 @@ type ServiceCardProps = {
   service: Service;
 };
 
-const surfaceClasses = ["bg-cobalt", "bg-ink-soft", "bg-ink"] as const;
-
-const initialPositionClasses = [
-  "z-[2] h-full min-h-[25rem] w-full rounded-none",
-  "z-[20] aspect-[0.7353] h-auto w-[clamp(8.5rem,15vw,11.5rem)] translate-x-[70vw] translate-y-[calc(max(100svh,25rem)_-_clamp(11.56rem,20.4vw,15.64rem)_-_3.125rem)] rounded-[clamp(1.125rem,2vw,1.375rem)] min-[35.0625rem]:translate-x-[74vw] min-[56.3125rem]:translate-x-[84vw]",
-  "z-[19] aspect-[0.7353] h-auto w-[clamp(8.5rem,15vw,11.5rem)] translate-x-[calc(70vw+clamp(9.125rem,16vw,12.375rem))] translate-y-[calc(max(100svh,25rem)_-_clamp(11.56rem,20.4vw,15.64rem)_-_3.125rem)] rounded-[clamp(1.125rem,2vw,1.375rem)] min-[35.0625rem]:translate-x-[calc(74vw+clamp(9.125rem,16vw,12.375rem))] min-[56.3125rem]:translate-x-[calc(84vw+clamp(9.125rem,16vw,12.375rem))]",
-] as const;
-
 export function ServiceCard({ index, service }: ServiceCardProps) {
-  const isFirst = index === 0;
-
   return (
-    <article
-      data-service-card
+    <a
+      data-service-grid-card
       data-index={index}
-      className={`absolute top-0 left-0 isolate origin-top-left overflow-hidden text-panel shadow-[0_1.125rem_3.375rem_rgb(0_0_0/0.28)] will-change-[transform,width,height,border-radius,opacity,filter] motion-reduce:relative motion-reduce:inset-auto motion-reduce:mx-3 motion-reduce:mb-3 motion-reduce:h-[70svh] motion-reduce:min-h-[32rem] motion-reduce:w-[calc(100%-1.5rem)] motion-reduce:translate-x-0 motion-reduce:translate-y-0 motion-reduce:rounded-[1.5rem] motion-reduce:opacity-100 ${surfaceClasses[index % surfaceClasses.length]} ${initialPositionClasses[index] ?? initialPositionClasses[2]}`}
+      href={service.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${service.name} 서비스 열기`}
+      className="group relative isolate flex size-full origin-center flex-col overflow-hidden rounded-[clamp(1rem,1.8vw,1.5rem)] bg-panel text-ink shadow-[0_1.5rem_4rem_rgb(23_23_19/0.11)] will-change-transform [backface-visibility:hidden] transition-[box-shadow] duration-500 hover:shadow-[0_2rem_5.5rem_rgb(23_23_19/0.17)] focus-visible:outline-ink md:rounded-[clamp(1.25rem,2vw,1.75rem)]"
     >
-      <ServiceCardVisual service={service} priority={isFirst} />
-
-      <div
-        className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(90deg,rgb(0_0_0/0.66)_0%,rgb(0_0_0/0.4)_36%,rgb(0_0_0/0.08)_70%,rgb(0_0_0/0.18)_100%),linear-gradient(0deg,rgb(0_0_0/0.34),transparent_46%)]"
-        aria-hidden="true"
-      />
-
-      <div
-        data-service-queue
-        className={`pointer-events-none absolute right-4 bottom-4 left-4 z-[5] motion-reduce:hidden ${isFirst ? "opacity-0" : "opacity-100"}`}
-        aria-hidden="true"
-      >
-        <small className="mb-1.5 block text-service-queue-meta font-semibold text-white/68">
-          {String(index + 1).padStart(2, "0")} · {service.host}
-        </small>
-        <strong className="block text-service-queue-title font-service-title md:text-service-queue-title-wide">
-          {service.name}
-        </strong>
+      <div className="relative h-[68%] flex-none overflow-hidden bg-paper-deep md:h-[52%]">
+        <ServiceCardVisual service={service} priority={index === 0} />
       </div>
 
-      <div
-        data-service-full
-        className={`pointer-events-none absolute top-1/2 left-[clamp(1.5rem,5.5vw,5.25rem)] z-[5] w-[min(41vw,33.75rem)] -translate-y-[48%] will-change-opacity motion-reduce:pointer-events-auto motion-reduce:opacity-100 max-md:top-auto max-md:right-5 max-md:bottom-[4.5rem] max-md:left-5 max-md:w-auto max-md:translate-y-0 ${isFirst ? "opacity-100" : "opacity-0"}`}
-      >
-        <p className="mb-4 text-service-host font-extrabold text-white/62 uppercase">
-          {service.host}
-        </p>
-        <h2 className="m-0 text-service-name font-display balance max-md:text-service-name-compact">
+      <div className="flex h-[32%] flex-none flex-col px-[clamp(0.75rem,1.4vw,1rem)] py-[clamp(0.7rem,1.2vw,0.9rem)] md:h-auto md:flex-1 md:p-[clamp(1.25rem,2vw,1.75rem)]">
+        <div className="order-3 mt-auto flex items-center justify-between gap-2 text-[0.55rem] font-semibold tracking-[0.08em] text-muted uppercase md:order-none md:mt-0 md:gap-4 md:text-service-queue-meta">
+          <span>{String(index + 1).padStart(2, "0")}</span>
+          <span className="truncate">{service.host}</span>
+        </div>
+        <h3 className="order-1 text-[clamp(0.85rem,3.7vw,1.15rem)] leading-none font-display tracking-[-0.045em] md:order-none md:mt-4 md:text-[clamp(2rem,3.4vw,3.5rem)] md:leading-[0.92] md:tracking-[-0.055em]">
           {service.name}
-        </h2>
-        <p className="mt-[1.375rem] max-w-[29.375rem] text-service-summary text-white/76 pretty max-md:max-w-[94%] max-md:text-service-summary-compact">
+        </h3>
+        <p className="mt-3 hidden max-w-[32rem] text-service-summary text-ink/62 pretty md:block">
           {service.summary}
         </p>
-        <a
-          data-service-link
-          href={service.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="pointer-events-auto mt-7 inline-flex min-h-11 items-center gap-2 rounded-control border border-white/48 bg-white/10 px-4 text-service-action font-bold text-panel backdrop-blur-[14px] transition-[background-color,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/18 focus-visible:outline-white max-sm:mt-[1.125rem]"
-          tabIndex={isFirst ? 0 : -1}
-        >
-          Open service
-          <ArrowUpRightIcon className="size-3.5" />
-        </a>
+        <span className="mt-auto hidden min-h-11 items-end justify-between gap-3 pt-4 text-service-action font-bold md:inline-flex">
+          서비스 열기
+          <ArrowUpRightIcon className="mb-0.5 size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </span>
       </div>
-    </article>
+    </a>
   );
 }

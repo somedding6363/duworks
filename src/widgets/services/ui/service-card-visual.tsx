@@ -16,15 +16,15 @@ export function ServiceCardVisual({ priority = false, service }: ServiceCardVisu
   return (
     <div
       data-service-visual
-      className="pointer-events-none absolute inset-0 z-[2] overflow-hidden bg-ink will-change-opacity"
+      className="pointer-events-none absolute inset-0 overflow-hidden bg-paper-deep"
     >
       <Image
         src={service.image}
         alt={service.imageAlt}
         fill
         priority={priority}
-        sizes="100vw"
-        className={`object-cover ${imagePositionClasses[service.imagePosition]}`}
+        sizes="(max-width: 48rem) 100vw, (max-width: 80rem) 50vw, 33vw"
+        className={`object-cover transition-transform duration-700 ease-[var(--ease-fluid)] group-hover:scale-[1.025] ${imagePositionClasses[service.imagePosition]}`}
       />
     </div>
   );
