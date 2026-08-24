@@ -36,14 +36,12 @@ type FanSlotTransform = {
 export function ServicesSection() {
   const section = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
-  const grid = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       const sectionElement = section.current;
       const stageElement = stage.current;
-      const gridElement = grid.current;
-      if (!sectionElement || !stageElement || !gridElement || liveServices.length === 0) return;
+      if (!sectionElement || !stageElement || liveServices.length === 0) return;
 
       const media = gsap.matchMedia();
       const getRemPixels = () =>
@@ -410,7 +408,6 @@ export function ServicesSection() {
     >
       <div
         ref={stage}
-        data-service-stage
         className="relative min-h-svh pt-[clamp(8.5rem,16vh,11rem)] pb-[clamp(6rem,10vw,9rem)]"
       >
         <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden">
@@ -453,11 +450,7 @@ export function ServicesSection() {
             </p>
           </header>
 
-          <div
-            ref={grid}
-            data-service-grid
-            className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-[clamp(1rem,2vw,1.5rem)] xl:grid-cols-3"
-          >
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-[clamp(1rem,2vw,1.5rem)] xl:grid-cols-3">
             {liveServices.map((service, index) => (
               <div
                 data-service-card-slot
