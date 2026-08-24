@@ -4,11 +4,11 @@ import { MoreToComeSection } from "@/widgets/more-to-come";
 import { ServicesSection } from "@/widgets/services";
 import { ServiceTicker } from "@/widgets/service-ticker";
 import { SiteFooter } from "@/widgets/site-footer";
-import { ScrollButton } from "@/shared/ui";
+import { ScrollButton, SmoothScroll } from "@/shared/ui";
 
 export function HomePage() {
   return (
-    <main id="top" className="w-full max-w-full overflow-x-clip">
+    <>
       <ScrollButton
         targetId="content"
         focusTarget
@@ -16,14 +16,20 @@ export function HomePage() {
       >
         본문으로 바로가기
       </ScrollButton>
-      <div id="content" tabIndex={-1}>
-        <HeroSection />
-        <ServiceTicker />
-        <ServicesSection />
-        <MoreToComeSection />
-      </div>
-      <SiteFooter />
+
+      <SmoothScroll>
+        <main id="top" className="w-full max-w-full overflow-x-clip">
+          <div id="content" tabIndex={-1}>
+            <HeroSection />
+            <ServiceTicker />
+            <ServicesSection />
+            <MoreToComeSection />
+          </div>
+          <SiteFooter />
+        </main>
+      </SmoothScroll>
+
       <FloatingActions />
-    </main>
+    </>
   );
 }
