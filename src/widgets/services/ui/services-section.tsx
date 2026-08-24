@@ -12,7 +12,7 @@ import {
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { ServiceCard } from "./service-card";
 
-const touchScrubDuration = 0.2;
+const touchScrubDuration = 0.08;
 const fanEntryScale = 0.92;
 const gridExpansionBaseDuration = 1 - serviceFanCardTransitionDuration;
 const gridExpansionDuration = gridExpansionBaseDuration * 3;

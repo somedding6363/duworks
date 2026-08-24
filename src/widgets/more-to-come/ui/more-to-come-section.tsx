@@ -5,7 +5,7 @@ import { ArrowUpIcon, ArrowUpRightIcon } from "@/shared/icons";
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { ScrollButton } from "@/shared/ui";
 
-const touchScrubDuration = 0.2;
+const touchScrubDuration = 0.08;
 const seedMinimumHeight = 112;
 const seedMaximumHeight = 160;
 const seedVminRatio = 0.18;
