@@ -167,10 +167,10 @@ export function MoreToComeSection() {
             titleElement,
             {
               autoAlpha: 1,
-              duration: 0.18,
+              duration: 0.56,
               ease: "none",
             },
-            0.52,
+            0,
           )
           .to(
             pathElement,
@@ -218,7 +218,7 @@ export function MoreToComeSection() {
     <section
       ref={section}
       id="next"
-      className="relative scroll-mt-20 bg-paper"
+      className="relative scroll-mt-20 bg-white"
       aria-labelledby="more-title"
     >
       <div
@@ -286,7 +286,7 @@ export function MoreToComeSection() {
           </div>
         </div>
       </div>
-      <div ref={footerClearance} className="h-0 bg-paper motion-reduce:hidden" aria-hidden="true" />
+      <div ref={footerClearance} className="h-0 bg-white motion-reduce:hidden" aria-hidden="true" />
     </section>
   );
 }
