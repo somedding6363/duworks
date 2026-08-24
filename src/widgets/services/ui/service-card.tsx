@@ -16,25 +16,25 @@ export function ServiceCard({ index, service }: ServiceCardProps) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${service.name} 서비스 열기`}
-      className="group relative isolate flex size-full origin-center flex-col overflow-hidden rounded-[clamp(1rem,1.8vw,1.5rem)] bg-panel text-ink shadow-[0_1.5rem_4rem_rgb(23_23_19/0.11)] will-change-transform [backface-visibility:hidden] transition-[box-shadow] duration-500 hover:shadow-[0_2rem_5.5rem_rgb(23_23_19/0.17)] focus-visible:outline-ink md:rounded-[clamp(1.25rem,2vw,1.75rem)]"
+      className="group relative isolate flex min-h-full w-full origin-center flex-col overflow-hidden rounded-[clamp(1rem,1.8vw,1.5rem)] bg-panel text-ink shadow-[0_1.5rem_4rem_rgb(23_23_19/0.11)] will-change-transform [backface-visibility:hidden] transition-[box-shadow] duration-500 hover:shadow-[0_2rem_5.5rem_rgb(23_23_19/0.17)] focus-visible:outline-ink md:rounded-[clamp(1.25rem,2vw,1.75rem)]"
     >
-      <div className="relative h-[68%] flex-none overflow-hidden bg-paper-deep md:h-[52%]">
+      <div className="relative aspect-[30/11] w-full flex-none overflow-hidden bg-paper-deep xl:aspect-[20/13]">
         <ServiceCardVisual service={service} priority={index === 0} />
       </div>
 
-      <div className="flex h-[32%] flex-none flex-col px-[clamp(0.75rem,1.4vw,1rem)] py-[clamp(0.7rem,1.2vw,0.9rem)] md:h-auto md:flex-1 md:p-[clamp(1.25rem,2vw,1.75rem)]">
-        <div className="order-3 mt-auto flex items-center justify-between gap-2 text-[0.55rem] font-semibold tracking-[0.08em] text-muted uppercase md:order-none md:mt-0 md:gap-4 md:text-service-queue-meta">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col p-[clamp(0.9rem,3.6vw,1.25rem)] xl:p-[clamp(1.25rem,2vw,1.75rem)]">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2 text-[0.55rem] font-semibold tracking-[0.08em] text-muted uppercase md:gap-4 md:text-service-queue-meta">
           <span>{String(index + 1).padStart(2, "0")}</span>
-          <span className="truncate">{service.host}</span>
+          <span className="text-right [overflow-wrap:anywhere]">{service.host}</span>
         </div>
-        <h3 className="order-1 text-[clamp(0.85rem,3.7vw,1.15rem)] leading-none font-display tracking-[-0.045em] md:order-none md:mt-4 md:text-[clamp(2rem,3.4vw,3.5rem)] md:leading-[0.92] md:tracking-[-0.055em]">
+        <h3 className="mt-3 text-[clamp(1.25rem,5vw,1.65rem)] leading-[0.95] font-display tracking-[-0.04em] md:mt-4 md:text-[clamp(1.5rem,3vw,2.5rem)] xl:text-[clamp(2rem,3.4vw,3.5rem)] xl:leading-[0.92] xl:tracking-[-0.055em]">
           {service.name}
         </h3>
-        <p className="mt-3 hidden max-w-[32rem] text-service-summary text-ink/62 pretty md:block">
+        <p className="mt-2 max-w-[32rem] text-[clamp(0.75rem,3.2vw,0.9rem)] leading-[1.45] text-ink/62 pretty md:mt-3 md:text-service-summary">
           {service.summary}
         </p>
-        <span className="mt-auto hidden min-h-11 items-end justify-between gap-3 pt-4 text-service-action font-bold md:inline-flex">
-          서비스 열기
+        <span className="mt-auto inline-flex items-end justify-between gap-3 pt-2 text-[clamp(0.7rem,3vw,0.8rem)] font-bold md:min-h-11 md:pt-3 md:text-service-action xl:pt-4">
+          서비스 바로가기
           <ArrowUpRightIcon className="mb-0.5 size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </span>
       </div>

@@ -400,7 +400,7 @@ export function ServicesSection() {
       <div
         ref={stage}
         data-service-stage
-        className="page-shell relative min-h-svh pt-[clamp(8.5rem,16vh,11rem)] pb-[clamp(6rem,10vw,9rem)]"
+        className="relative min-h-svh pt-[clamp(8.5rem,16vh,11rem)] pb-[clamp(6rem,10vw,9rem)]"
       >
         <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden">
           <div
@@ -421,40 +421,42 @@ export function ServicesSection() {
           </div>
         </div>
 
-        <header
-          data-service-intro
-          className="mb-[clamp(2rem,5vw,4rem)] flex items-end justify-between gap-8"
-        >
-          <div>
-            <p className="mb-3 text-service-queue-meta font-semibold tracking-[0.14em] text-muted uppercase">
-              Our services
-            </p>
-            <h2
-              id="services-title"
-              className="text-[clamp(3rem,7vw,6.5rem)] leading-[0.86] font-display tracking-[-0.065em]"
-            >
-              Services
-            </h2>
-          </div>
-          <p className="pb-1 text-service-queue-meta font-semibold tracking-[0.08em] text-muted tabular-nums uppercase">
-            {String(liveServices.length).padStart(2, "0")} live
-          </p>
-        </header>
-
-        <div
-          ref={grid}
-          data-service-grid
-          className="flex flex-wrap justify-center gap-3 md:grid md:grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] md:gap-[clamp(1rem,2vw,1.5rem)]"
-        >
-          {liveServices.map((service, index) => (
-            <div
-              data-service-card-slot
-              className="relative aspect-[4/5] w-[clamp(10rem,38vw,11.5rem)] flex-none [backface-visibility:hidden] md:w-auto"
-              key={service.host}
-            >
-              <ServiceCard service={service} index={index} />
+        <div className="page-shell">
+          <header
+            data-service-intro
+            className="mb-[clamp(2rem,5vw,4rem)] flex items-end justify-between gap-8"
+          >
+            <div>
+              <p className="mb-3 text-service-queue-meta font-semibold tracking-[0.14em] text-muted uppercase">
+                Our services
+              </p>
+              <h2
+                id="services-title"
+                className="text-[clamp(3rem,7vw,6.5rem)] leading-[0.86] font-display tracking-[-0.065em]"
+              >
+                Services
+              </h2>
             </div>
-          ))}
+            <p className="pb-1 text-service-queue-meta font-semibold tracking-[0.08em] text-muted tabular-nums uppercase">
+              {String(liveServices.length).padStart(2, "0")} live
+            </p>
+          </header>
+
+          <div
+            ref={grid}
+            data-service-grid
+            className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-[clamp(1rem,2vw,1.5rem)] xl:grid-cols-3"
+          >
+            {liveServices.map((service, index) => (
+              <div
+                data-service-card-slot
+                className="relative grid min-w-0 [backface-visibility:hidden]"
+                key={service.host}
+              >
+                <ServiceCard service={service} index={index} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
