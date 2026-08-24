@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "SUIT Variable", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+
+  --color-paper: #f3f0e8;
+  --color-paper-deep: #e9e4da;
+  --color-panel: #ffffff;
+  --color-ink: #171713;
+  --color-ink-soft: #35352f;
+  --color-ink-faint: #c7c5be;
+  --color-muted: #6c6a62;
+  --color-line: #d8d4ca;
+  --color-acid: #d9ff57;
+  --color-cobalt: #5067ef;
+  --color-coral: #ff725e;
+  --color-white-soft: #fffef9;
+  --color-glass-edge: rgb(255 255 255 / 0.72);
+  --color-glass-fill: rgb(255 255 255 / 0.28);
+  --color-glass-highlight: rgb(255 255 255 / 0.66);
+
+  --text-hero: clamp(3.25rem, 14vw, 12.75rem);
+  --text-hero--line-height: 0.72;
+  --text-hero--letter-spacing: -0.095em;
+  --text-hero-note: 0.6875rem;
+  --text-hero-note--line-height: 1.3;
+  --text-hero-note--letter-spacing: 0.12em;
+  --text-hero-support: clamp(0.95rem, 4.45vw, 1rem);
+  --text-hero-support--line-height: 1.45;
+  --text-hero-support--letter-spacing: -0.04em;
+  --text-hero-support-wide: clamp(1.125rem, 2vw, 1.75rem);
+  --text-hero-support-wide--line-height: 1.45;
+  --text-hero-support-wide--letter-spacing: -0.04em;
+  --text-orbit-label: 0.625rem;
+  --text-orbit-label--line-height: 1.3;
+  --text-orbit-label--letter-spacing: -0.015em;
+  --text-orbit-label-wide: 0.8125rem;
+  --text-orbit-label-wide--line-height: 1.4;
+  --text-orbit-label-wide--letter-spacing: -0.015em;
+  --text-ticker: clamp(1.3rem, 3.2vw, 2.4rem);
+  --text-ticker--line-height: 1.5;
+  --text-ticker--letter-spacing: -0.035em;
+  --text-more: clamp(4.875rem, 13vw, 11.25rem);
+  --text-more--line-height: 0.78;
+  --text-more--letter-spacing: -0.065em;
+  --text-more-compact: clamp(4.25rem, 20vw, 7.5rem);
+  --text-more-compact--line-height: 1.5;
+  --text-more-compact--letter-spacing: 0;
+  --text-more-subtitle: 0.875rem;
+  --text-more-subtitle--line-height: 1.5;
+  --text-more-subtitle--letter-spacing: -0.015em;
+  --text-display: clamp(3rem, 6.6vw, 6.75rem);
+  --text-display--line-height: 0.96;
+  --text-display--letter-spacing: -0.052em;
+  --text-section: clamp(2.45rem, 4.6vw, 4.8rem);
+  --text-section--line-height: 1.02;
+  --text-section--letter-spacing: -0.044em;
+  --text-title: clamp(1.75rem, 2.6vw, 2.75rem);
+  --text-title--line-height: 1.08;
+  --text-title--letter-spacing: -0.034em;
+  --text-body-lg: clamp(1.1rem, 1.45vw, 1.38rem);
+  --text-body-lg--line-height: 1.62;
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.4;
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.3;
+  --text-interface: 0.875rem;
+  --text-interface--line-height: 1.5;
+  --text-service-action: 0.75rem;
+  --text-service-action--line-height: 1.5;
+  --text-floating-action: 0.5625rem;
+  --text-floating-action--line-height: 1;
+  --text-floating-action--letter-spacing: 0.01em;
+  --text-service-queue-meta: 0.625rem;
+  --text-service-queue-meta--line-height: 1.5;
+  --text-service-summary: clamp(0.9375rem, 1.2vw, 1.125rem);
+  --text-service-summary--line-height: 1.6;
+  --text-footer-brand: 1rem;
+  --text-footer-brand--line-height: 1.5;
+  --text-footer-brand--letter-spacing: -0.035em;
+  --text-footer-domain: 0.875rem;
+  --text-footer-domain--line-height: 1.5;
+  --text-footer-domain--letter-spacing: -0.01em;
+
+  --font-weight-display: 400;
+  --font-weight-hero-note: 400;
+  --font-weight-support: 100;
+  --font-weight-utility: 700;
+
+  --spacing-section: clamp(8rem, 15vw, 15rem);
+  --spacing-section-sm: clamp(6rem, 10vw, 10rem);
+
+  --radius-window: 1.75rem;
+  --radius-panel: 1.25rem;
+  --radius-control: 999px;
+
+  --shadow-product: 0 40px 100px rgb(23 23 19 / 0.12);
+  --shadow-float: 0 16px 50px rgb(23 23 19 / 0.09);
+  --shadow-liquid:
+    0 18px 56px rgb(23 23 19 / 0.16), inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 -1px 0 rgb(23 23 19 / 0.06);
+
+  --ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snappy: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --breakpoint-xs: 30rem;
+  --breakpoint-wide: 100rem;
+}
+
+:root {
+  --page-gutter: clamp(1.25rem, 3.8vw, 4rem);
+  --line-soft: rgb(23 23 19 / 0.075);
+  --line-faint: rgb(23 23 19 / 0.045);
+  --ticker-name-min-width: clamp(14rem, 23vw, 21rem);
+  --ticker-host-min-width: clamp(22rem, 34vw, 32rem);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: var(--color-paper);
+  }
+
+  body {
+    margin: 0;
+    overflow-x: clip;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--color-cobalt);
+    outline-offset: 4px;
+  }
+
+  ::selection {
+    background: var(--color-acid);
+    color: var(--color-ink);
+  }
+}
+
+@utility page-shell {
+  width: min(calc(100% - (var(--page-gutter) * 2)), 86rem);
+  margin-inline: auto;
+}
+
+@utility balance {
+  text-wrap: balance;
+}
+
+@utility pretty {
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
