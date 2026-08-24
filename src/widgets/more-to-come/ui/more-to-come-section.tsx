@@ -148,7 +148,7 @@ export function MoreToComeSection() {
         });
 
         timeline
-          .set(contentElement, { y: () => getTitleCenterOffset() }, 0)
+          .set(titleElement, { y: () => getTitleCenterOffset() }, 0)
           .fromTo(
             pathElement,
             {
@@ -188,7 +188,7 @@ export function MoreToComeSection() {
           .set(periodElement, { autoAlpha: 1 }, 1.34)
           .set(pathElement, { autoAlpha: 0 }, 1.34)
           .to(
-            contentElement,
+            titleElement,
             {
               y: 0,
               duration: 0.22,
