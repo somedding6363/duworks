@@ -13,7 +13,7 @@ import { HeroOrbit } from "./hero-orbit";
 import { HeroServiceFan } from "./hero-service-fan";
 
 const WORDMARK = "DUWORKS";
-const touchScrubDuration = 0.2;
+const touchScrubDuration = 0.08;
 
 export function HeroSection() {
   const section = useRef<HTMLElement>(null);
