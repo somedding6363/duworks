@@ -7,7 +7,7 @@ type SmoothScrollProps = {
   children: ReactNode;
 };
 
-const smoothCatchUpDuration = 0.65;
+const smoothCatchUpDuration = 1.1;
 
 export function SmoothScroll({ children }: SmoothScrollProps) {
   const wrapper = useRef<HTMLDivElement>(null);
