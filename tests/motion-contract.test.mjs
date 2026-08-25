@@ -17,3 +17,14 @@ test("keeps mobile scrolling native with short scroll-linked catch-up", () => {
     assert.match(source, /const touchScrubDuration = 0\.08/);
   });
 });
+
+test("scrolls service expansion to its actual boundary in either direction", () => {
+  const servicesMotionSource = read("src/widgets/services/ui/services-section.tsx");
+
+  assert.doesNotMatch(servicesMotionSource, /snap:\s*\{/);
+  assert.match(servicesMotionSource, /ScrollSmoother\.get\(\)/);
+  assert.match(servicesMotionSource, /const target = direction === 1 \? end : start/);
+  assert.match(servicesMotionSource, /smoother\.scrollTo\(target, true\)/);
+  assert.match(servicesMotionSource, /window\.scrollTo\(\{ top: target, behavior: "smooth" \}\)/);
+  assert.match(servicesMotionSource, /direction !== 1 && direction !== -1/);
+});
