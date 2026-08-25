@@ -294,6 +294,7 @@ export function ServicesSection() {
 
         const expansionTimeline = gsap.timeline({
           scrollTrigger: {
+            id: "services-expansion",
             trigger: sectionElement,
             start: "top top",
             end: () => `+=${window.innerHeight * gridExpansionDuration}`,

@@ -270,6 +270,7 @@ export function MoreToComeSection() {
           >
             <ScrollButton
               targetId="services"
+              scrollTriggerId="services-expansion"
               className="group flex min-h-16 cursor-pointer items-center justify-between px-4 text-interface text-ink transition-colors duration-300 hover:bg-panel sm:px-6 [@media(max-height:22rem)]:min-h-11"
             >
               서비스 보기

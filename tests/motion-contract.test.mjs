@@ -28,3 +28,14 @@ test("scrolls service expansion to its actual boundary in either direction", () 
   assert.match(servicesMotionSource, /window\.scrollTo\(\{ top: target, behavior: "smooth" \}\)/);
   assert.match(servicesMotionSource, /direction !== 1 && direction !== -1/);
 });
+
+test("targets the completed service grid from the More to Come action", () => {
+  const servicesMotionSource = read("src/widgets/services/ui/services-section.tsx");
+  const moreToComeSource = read("src/widgets/more-to-come/ui/more-to-come-section.tsx");
+  const scrollButtonSource = read("src/shared/ui/scroll-button.tsx");
+
+  assert.match(servicesMotionSource, /id: "services-expansion"/);
+  assert.match(moreToComeSource, /scrollTriggerId="services-expansion"/);
+  assert.match(scrollButtonSource, /ScrollTrigger\.getById\(scrollTriggerId\)/);
+  assert.match(scrollButtonSource, /scrollTrigger\.scroll\(scrollPosition\)/);
+});
