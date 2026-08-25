@@ -300,9 +300,7 @@ export function ServicesSection() {
             end: () => `+=${window.innerHeight * gridExpansionDuration}`,
             scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
             invalidateOnRefresh: true,
-            onUpdate: (trigger) => {
-              const { progress } = trigger;
-              scrollToGridExpansionBoundary(trigger);
+            onUpdate: ({ progress }) => {
               setGridFace(progress >= flipHandoffThreshold);
               setFanActive(progress > 0 && progress < flipHandoffThreshold);
               setGridHandoff(progress >= handoffThreshold);
@@ -325,6 +323,13 @@ export function ServicesSection() {
             },
           },
         });
+
+        const handleGridExpansionScrollEnd = () => {
+          const trigger = expansionTimeline.scrollTrigger;
+          if (trigger) scrollToGridExpansionBoundary(trigger);
+        };
+
+        ScrollTrigger.addEventListener("scrollEnd", handleGridExpansionScrollEnd);
 
         fanCards.forEach((card, index) => {
           expansionTimeline.fromTo(
@@ -406,6 +411,7 @@ export function ServicesSection() {
         }
 
         return () => {
+          ScrollTrigger.removeEventListener("scrollEnd", handleGridExpansionScrollEnd);
           setGridFace(true);
           setGridHandoff(true);
           expansionTimeline.scrollTrigger?.kill();

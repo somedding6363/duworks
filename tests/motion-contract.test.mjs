@@ -18,7 +18,7 @@ test("keeps mobile scrolling native with short scroll-linked catch-up", () => {
   });
 });
 
-test("scrolls service expansion to its actual boundary in either direction", () => {
+test("scrolls service expansion to its actual boundary after scrolling stops", () => {
   const servicesMotionSource = read("src/widgets/services/ui/services-section.tsx");
 
   assert.doesNotMatch(servicesMotionSource, /snap:\s*\{/);
@@ -27,6 +27,18 @@ test("scrolls service expansion to its actual boundary in either direction", () 
   assert.match(servicesMotionSource, /smoother\.scrollTo\(target, true\)/);
   assert.match(servicesMotionSource, /window\.scrollTo\(\{ top: target, behavior: "smooth" \}\)/);
   assert.match(servicesMotionSource, /direction !== 1 && direction !== -1/);
+  assert.match(
+    servicesMotionSource,
+    /ScrollTrigger\.addEventListener\("scrollEnd", handleGridExpansionScrollEnd\)/,
+  );
+  assert.match(
+    servicesMotionSource,
+    /ScrollTrigger\.removeEventListener\("scrollEnd", handleGridExpansionScrollEnd\)/,
+  );
+  assert.match(
+    servicesMotionSource,
+    /onUpdate: \(\{ progress \}\) => \{\s+setGridFace\(progress >= flipHandoffThreshold\)/,
+  );
 });
 
 test("targets the completed service grid from the More to Come action", () => {
