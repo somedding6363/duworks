@@ -1,10 +1,8 @@
 "use client";
 
-import { useRef, useState, type CSSProperties } from "react";
-import { liveServices } from "@/entities/service";
-import { ArrowUpRightIcon } from "@/shared/icons";
+import { useRef, type CSSProperties } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
-import { ShowcaseIntroFace, ShowcaseServiceFace } from "./showcase-face";
+import { createParticleSphere } from "../lib/particle-sphere";
 
 const WORDMARK = "DUWORKS";
 // iOS는 JS로 오는 스크롤 이벤트가 불규칙해 카드가 뚝뚝 따라가므로, 터치에서는 추종을 조금 늦춰 부드럽게 잇는다.
@@ -12,63 +10,53 @@ const touchScrubDuration = 0.3;
 const heroCopyMinGap = 48;
 const scaleBleed = 4;
 // 타임라인 길이 단위. 스크롤 거리도 같은 비율(1단위 = max(100svh, 643px))로 CSS에서 만든다.
-const handoffUnits = 1.4;
-const stepUnits = 0.8;
-// 원통을 6칸으로 나눠 양옆 카드가 비스듬히 보이게 한다. 칸보다 카드가 적으면 뒤쪽 칸은 비워 둔다.
-const ringSlots = 6;
-const ringAngle = 360 / ringSlots;
-const stepCount = liveServices.length;
+// 카드가 점으로 줄어드는 구간 → 점이 울퉁불퉁한 구로 퍼지는 구간 → 구가 울퉁불퉁한 원통으로 바뀌는 구간 → 머무는 구간.
+const shrinkUnits = 1.4;
+const spreadUnits = 1.2;
+const morphUnits = 1.3;
+const holdUnits = 0.4;
+const totalUnits = shrinkUnits + spreadUnits + morphUnits + holdUnits;
+// 카드가 줄어들어 끝나는 점의 지름(px).
+const dotSize = 10;
+// 폰은 점 개수와 해상도를 낮춰 부담을 줄인다.
+const particleCount = { touch: 900, desktop: 1600 };
 
 // 크기·위치는 CSS가 진행도(--p)로 계산해, 화면 크기가 바뀌면 재계산을 기다리지 않고 즉시 따라간다.
 const sceneStyle = {
-  // 폭·높이 기준 중 작은 값을 쓰되, 좁거나 낮은 화면에서도 카드 높이 20rem(폭 15rem) 아래로는 줄이지 않는다.
-  "--card-h-base": "calc(max(15rem, min(clamp(16rem, 88vw, 34rem), calc(78svh * 0.75))) * 4 / 3)",
-  // 단, 화면이 그보다 낮으면 최소 크기보다 화면 안에 다 보이는 것을 우선한다.
-  // 카드 아래 CTA 자리를 남긴다.
-  "--card-h": "min(var(--card-h-base), calc(100svh - 8rem))",
-  "--card-w": "calc(var(--card-h) * 3 / 4)",
+  // 카드 요소의 기준 크기(회전 전 가로·세로). 실제 보이는 크기는 scale로 정한다.
+  "--card-h": "20rem",
+  "--card-w": "15rem",
   "--showcase-height": "max(100svh, var(--showcase-content, 0px))",
   // 전환이 진행되는 스크롤 거리. 섹션을 이만큼 더 길게 두고, 그 동안 stage를 화면에 붙여 둔다.
   // sticky는 부모의 content box 안에서만 움직이므로 padding이 아닌 height로 늘린다.
-  "--showcase-distance": `calc(${handoffUnits + stepUnits * stepCount} * max(100svh, 643px))`,
-  // pin 중에는 stage 하단만 보이므로, 카드는 보이는 화면의 가운데(위아래 여백 동일)에 착지한다.
+  "--showcase-distance": `calc(${totalUnits} * max(100svh, 643px))`,
+  // pin 중에는 stage 하단만 보이므로, 점은 보이는 화면의 가운데에 모인다.
   "--landing-y": "calc((var(--showcase-height) - 100svh) / 2)",
-  // 원통 반경. 앞면이 z=0에 오도록 원통 전체를 이만큼 뒤로 민다.
-  "--ring-r": `calc(var(--card-w) / 2 / tan(${ringAngle / 2}deg) + 1rem)`,
 } as CSSProperties;
 
 // 카드 크기·잘라내기를 매 프레임 바꾸면 모바일에서 다시 그리는 비용이 커 끊긴다.
-// 요소는 착지 카드 크기로 고정하고, 처음에는 scale로 화면만큼 키워 두었다가 줄인다.
+// 요소 크기는 고정하고, 처음에는 scale로 화면만큼 키워 두었다가 점 크기까지 줄인다.
 // scale·rotate·translate만 바뀌므로 합성 단계에서 처리된다.
-// --sx0/--sy0(화면 ÷ 카드)은 CSS에서 길이끼리 나눌 수 없어 JS가 넣는다.
+// --sx0/--sy0(화면 ÷ 카드), --dx/--dy(점 ÷ 카드)는 CSS에서 길이끼리 나눌 수 없어 JS가 넣는다.
 const heroCardStyle = {
   "--p": 0,
   // 모서리는 카드 크기와 같은 진행도(--p)에서 계산해, 카드가 실제로 줄어드는 만큼만 둥글어지게 한다.
   // 카드가 거의 화면 가득한데 모서리만 둥글면 그 바깥으로 뒷배경이 비친다.
   "--r": "min(1, var(--p) * 20)",
-  "--sx": "calc(var(--sx0, 1) + (1 - var(--sx0, 1)) * var(--p))",
-  "--sy": "calc(var(--sy0, 1) + (1 - var(--sy0, 1)) * var(--p))",
-  // 90° 회전 후 세로 카드로 보이도록, 회전 전 기준으로 가로는 카드 높이, 세로는 카드 폭이다.
+  "--sx": "calc(var(--sx0, 1) + (var(--dx, 1) - var(--sx0, 1)) * var(--p))",
+  "--sy": "calc(var(--sy0, 1) + (var(--dy, 1) - var(--sy0, 1)) * var(--p))",
   width: "var(--card-h)",
   height: "var(--card-w)",
   translate: "-50% calc(-50% + var(--landing-y) * var(--p))",
   rotate: "calc(90deg * var(--p))",
   scale: "var(--sx) var(--sy)",
-  // 배율만큼 나눠 보이는 반경을 일정하게 둔다. 첫 화면은 꽉 찬 사각형이다.
+  // 배율만큼 나눠 보이는 반경을 일정하게 둔다. 첫 화면은 꽉 찬 사각형이고, 점이 되면 원이 된다.
   borderRadius: "calc(1.5rem * var(--r) / var(--sx)) / calc(1.5rem * var(--r) / var(--sy))",
 } as CSSProperties;
 
-const ringViewStyle = {
-  translate: "0 var(--landing-y)",
-} as CSSProperties;
-
-// CTA는 카드 아래 남은 여백의 가운데에 둔다.
-const ctaStyle = {
-  translate: "-50% calc(var(--landing-y) + var(--card-h) / 2 + (100svh - var(--card-h)) / 4 - 50%)",
-} as CSSProperties;
-
-const ringOffsetStyle = {
-  transform: "translateZ(calc(var(--ring-r) * -1))",
+// 점이 되어 갈 때 카드 색 대신 파티클과 같은 청록으로 채운다.
+const dotFillStyle = {
+  opacity: "clamp(0, (var(--p) - 0.8) * 5, 1)",
 } as CSSProperties;
 
 // 카드 안의 글자는 카드 배율의 역수로 되돌려 찌그러지지 않게 한다.
@@ -81,12 +69,7 @@ export function ShowcaseSection() {
   const stage = useRef<HTMLDivElement>(null);
   const heroCard = useRef<HTMLDivElement>(null);
   const heroCopy = useRef<HTMLDivElement>(null);
-  const cardCopy = useRef<HTMLDivElement>(null);
-  const ringView = useRef<HTMLDivElement>(null);
-  const ring = useRef<HTMLDivElement>(null);
-  const cta = useRef<HTMLDivElement>(null);
-  // 0은 hero 카드, 1부터 서비스 카드. 착지 전에는 -1.
-  const [activeFace, setActiveFace] = useState(-1);
+  const canvas = useRef<HTMLCanvasElement>(null);
 
   useGSAP(
     () => {
@@ -94,24 +77,12 @@ export function ShowcaseSection() {
       const stageElement = stage.current;
       const cardElement = heroCard.current;
       const heroCopyElement = heroCopy.current;
-      const cardCopyElement = cardCopy.current;
-      const ringViewElement = ringView.current;
-      const ringElement = ring.current;
-      const ctaElement = cta.current;
-      if (
-        !ringViewElement ||
-        !ringElement ||
-        !ctaElement ||
-        !sectionElement ||
-        !stageElement ||
-        !cardElement ||
-        !heroCopyElement ||
-        !cardCopyElement
-      ) {
+      const canvasElement = canvas.current;
+      if (!sectionElement || !stageElement || !cardElement || !heroCopyElement || !canvasElement) {
         return;
       }
 
-      // 첫 화면에서 카드가 stage를 꽉 채우도록 배율을 넣는다. 크기가 바뀌면 바로 다시 계산한다.
+      // 첫 화면에서 카드가 stage를 꽉 채우고, 끝에는 점 크기가 되도록 배율을 넣는다. 크기가 바뀌면 바로 다시 계산한다.
       const measureScale = () => {
         const cardWidth = cardElement.offsetWidth;
         const cardHeight = cardElement.offsetHeight;
@@ -127,6 +98,8 @@ export function ShowcaseSection() {
           "--sy0",
           String((stageElement.clientHeight + bleed) / cardHeight),
         );
+        sectionElement.style.setProperty("--dx", String(dotSize / cardWidth));
+        sectionElement.style.setProperty("--dy", String(dotSize / cardHeight));
       };
 
       measureScale();
@@ -189,9 +162,34 @@ export function ShowcaseSection() {
           const resizeObserver = new ResizeObserver(measureContent);
           heroCopyChildren.forEach((child) => resizeObserver.observe(child));
 
-          const H = handoffUnits;
-          const S = stepUnits;
-          const total = H + S * stepCount;
+          const isTouch = ScrollTrigger.isTouch === 1;
+          const particlesView = createParticleSphere(
+            canvasElement,
+            isTouch ? particleCount.touch : particleCount.desktop,
+            isTouch ? 1.5 : 2,
+          );
+          const canvasObserver = new ResizeObserver(() => particlesView?.resize());
+          canvasObserver.observe(canvasElement);
+
+          // 파티클은 퍼지는 구간부터, stage가 화면에 보이는 동안만 그린다.
+          let stageVisible = false;
+          let particlesStarted = false;
+          const updateActive = () => particlesView?.setActive(stageVisible && particlesStarted);
+          // IntersectionObserver는 화면 크기 변경으로 pin이 풀렸다 다시 걸릴 때 보임 상태를 놓친다.
+          // 섹션이 화면에 걸쳐 있는 스크롤 구간으로 판단해, 재계산 뒤에도 바로 맞춰지게 한다.
+          const visibility = ScrollTrigger.create({
+            trigger: sectionElement,
+            start: "top bottom",
+            end: "bottom top",
+            onToggle: ({ isActive }) => {
+              stageVisible = isActive;
+              updateActive();
+            },
+            onRefresh: ({ isActive }) => {
+              stageVisible = isActive;
+              updateActive();
+            },
+          });
 
           const handoff = gsap.timeline({
             defaults: { ease: "none" },
@@ -204,58 +202,56 @@ export function ShowcaseSection() {
               // 전환 거리는 섹션 높이가 이미 만들고 있으므로 pin 여백은 더하지 않는다.
               pin: smooth ? stageElement : false,
               pinSpacing: false,
-              scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
+              scrub: isTouch ? touchScrubDuration : true,
               invalidateOnRefresh: true,
             },
           });
 
-          const sideFaces = gsap.utils.toArray<HTMLElement>("[data-showcase-side-face]");
+          const shrinkEnd = shrinkUnits;
+          const spreadEnd = shrinkEnd + spreadUnits;
+          const particles = { spread: 0, morph: 0, flow: 0 };
+          const syncParticles = () => particlesView?.setProgress({ ...particles });
 
-          // 1. hero 카드가 회전하며 줄어들어 착지한다.
+          // 1. hero 카드가 회전하며 줄어들어 점이 된다.
           handoff
-            .fromTo(cardElement, { "--p": 0 }, { "--p": 1, duration: H, ease: "power2.inOut" }, 0)
-            .to(heroCopyElement, { autoAlpha: 0, duration: 0.3 * H }, 0.05 * H)
             .fromTo(
-              cardCopyElement,
-              { autoAlpha: 0 },
-              { autoAlpha: 1, duration: 0.3 * H },
-              0.7 * H,
-            );
+              cardElement,
+              { "--p": 0 },
+              { "--p": 1, duration: shrinkUnits, ease: "power2.inOut" },
+              0,
+            )
+            .to(heroCopyElement, { autoAlpha: 0, duration: 0.3 * shrinkUnits }, 0.05 * shrinkUnits);
 
-          // 2. 착지하면 같은 모습의 원통 0번 면으로 바꾸고, 양옆 카드와 CTA를 드러낸다.
-          handoff
-            .set(ringViewElement, { autoAlpha: 1 }, H)
-            .set(cardElement, { autoAlpha: 0 }, H)
-            .fromTo(sideFaces, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 * S }, H)
-            .fromTo(
-              ctaElement,
-              { autoAlpha: 0, y: 12 },
-              { autoAlpha: 1, y: 0, duration: 0.25 * S },
-              H,
-            );
-
-          // 3. 서비스마다 한 칸씩 돌리고, 각 카드에서 잠깐 머문다.
-          gsap.set(ringElement, { rotationY: 0, transformStyle: "preserve-3d", force3D: true });
-          for (let step = 1; step <= stepCount; step += 1) {
-            handoff.to(
-              ringElement,
-              { rotationY: -ringAngle * step, duration: 0.7 * S, ease: "power2.inOut" },
-              H + S * (step - 1) + 0.15 * S,
-            );
+          // 2. 점이 사라지는 자리에서 파티클이 울퉁불퉁한 구로 고르게 퍼진다. WebGL을 못 쓰면 점으로 남는다.
+          if (particlesView) {
+            handoff
+              .to(cardElement, { autoAlpha: 0, duration: 0.1 * spreadUnits }, shrinkEnd)
+              .to(
+                particles,
+                { spread: 1, duration: spreadUnits, onUpdate: syncParticles },
+                shrinkEnd,
+              )
+              // 3. 구가 세로로 긴 울퉁불퉁한 원통으로 바뀐다.
+              .to(
+                particles,
+                { morph: 1, duration: morphUnits, onUpdate: syncParticles },
+                spreadEnd,
+              );
           }
 
-          // 마지막 카드에서 머무는 시간까지 포함해 타임라인 길이를 스크롤 거리(CSS)와 같은 비율로 맞춘다.
-          handoff.to({}, { duration: 0 }, total);
-
-          // 현재 앞에 있는 면을 CTA에 반영한다. 면이 바뀔 때만 상태를 갱신한다.
-          const updateActiveFace = (progress: number) => {
-            const time = progress * total;
-            const face = time < H ? -1 : gsap.utils.clamp(0, stepCount, Math.round((time - H) / S));
-            setActiveFace((current) => (current === face ? current : face));
-          };
-          handoff.eventCallback("onUpdate", () => updateActiveFace(handoff.progress()));
+          // 머무는 구간까지 포함해 타임라인 길이를 스크롤 거리(CSS)와 같은 비율로 맞춘다.
+          handoff.to({}, { duration: 0 }, totalUnits);
+          handoff.eventCallback("onUpdate", () => {
+            const started = handoff.time() >= shrinkEnd;
+            if (started === particlesStarted) return;
+            particlesStarted = started;
+            updateActive();
+          });
 
           return () => {
+            visibility.kill();
+            canvasObserver.disconnect();
+            particlesView?.destroy();
             resizeObserver.disconnect();
             cancelAnimationFrame(refreshFrame);
             stageElement.style.removeProperty("position");
@@ -274,8 +270,6 @@ export function ShowcaseSection() {
     },
     { scope: section },
   );
-
-  const activeService = activeFace >= 1 ? liveServices[activeFace - 1] : undefined;
 
   return (
     <section
@@ -311,65 +305,18 @@ export function ShowcaseSection() {
           </div>
 
           <div
-            ref={cardCopy}
-            className="invisible absolute top-1/2 left-1/2 flex h-[var(--card-h)] w-[var(--card-w)] -translate-1/2 -rotate-90 flex-col justify-end p-3 opacity-0"
-            style={unscaleStyle}
+            className="pointer-events-none absolute inset-0 bg-teal"
+            style={dotFillStyle}
             aria-hidden="true"
-          >
-            <p className="text-showcase-card-note tracking-[0.12em] text-white-soft/60">
-              FOLLOW THE IDEA.
-            </p>
-            <p className="mt-1.5 text-showcase-card-title font-display">{WORDMARK}</p>
-          </div>
+          />
         </div>
 
-        {/* 착지 이후의 원통 캐러셀. 0번 면은 착지한 hero 카드와 같은 모습이다. */}
-        <div
-          ref={ringView}
-          className="pointer-events-none invisible absolute top-1/2 left-1/2 size-0 opacity-0 [perspective:1400px] [transform-style:preserve-3d]"
-          style={ringViewStyle}
+        {/* 점이 퍼져 구와 원통이 되는 파티클. pin 중에 보이는 화면(stage 하단)을 채운다. */}
+        <canvas
+          ref={canvas}
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-svh w-full"
           aria-hidden="true"
-        >
-          <div className="[transform-style:preserve-3d]" style={ringOffsetStyle}>
-            <div ref={ring} className="will-change-transform">
-              {Array.from({ length: stepCount + 1 }, (_, face) => (
-                <div
-                  key={face}
-                  data-showcase-side-face={face > 0 ? "" : undefined}
-                  className="absolute top-[calc(var(--card-h)/-2)] left-[calc(var(--card-w)/-2)] h-[var(--card-h)] w-[var(--card-w)] [backface-visibility:hidden]"
-                  style={{ transform: `rotateY(${face * ringAngle}deg) translateZ(var(--ring-r))` }}
-                >
-                  {face === 0 ? (
-                    <ShowcaseIntroFace />
-                  ) : (
-                    <ShowcaseServiceFace index={face - 1} service={liveServices[face - 1]} />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute top-1/2 left-1/2" style={ctaStyle}>
-          <div ref={cta} className="invisible opacity-0">
-            {activeService ? (
-              <a
-                href={activeService.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${activeService.name} 서비스 열기`}
-                className="inline-flex min-h-11 items-center gap-2 rounded-control bg-ink px-5 text-interface font-bold whitespace-nowrap text-white-soft transition-transform duration-300 ease-fluid active:scale-[0.97]"
-              >
-                서비스 바로가기
-                <ArrowUpRightIcon className="size-4" />
-              </a>
-            ) : (
-              <p className="inline-flex min-h-11 items-center px-5 text-interface font-bold whitespace-nowrap text-muted">
-                스크롤해서 서비스 보기
-              </p>
-            )}
-          </div>
-        </div>
+        />
       </div>
     </section>
   );
