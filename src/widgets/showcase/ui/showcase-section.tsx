@@ -110,10 +110,18 @@ export function ShowcaseSection() {
           const { motion, smooth } = context.conditions ?? {};
           if (!motion) return;
 
+          // sticky 위치 속성을 CSS로 늘 두면, 데스크톱 pin이 그 top 값을 pin 여백 요소로 복사해
+          // stage 전체가 (stage 높이 - 화면 높이)만큼 위로 밀린다. JS pin을 쓰지 않을 때만 붙인다.
+          if (!smooth) {
+            stageElement.style.position = "sticky";
+            stageElement.style.top = "min(0px, calc(100svh - var(--showcase-height)))";
+          }
+
           // 화면이 hero 내용보다 낮으면 stage를 늘려 하단까지 스크롤로 보여준 뒤 pin을 시작한다.
           // 결과(섹션 높이)에 영향을 받지 않는 값만 읽어, 측정 → 높이 변경 → 재측정 순환이 생기지 않게 한다.
           const heroCopyChildren = Array.from(heroCopyElement.children) as HTMLElement[];
           let contentHeight = 0;
+          let refreshFrame = 0;
           const measureContent = () => {
             const copyStyle = getComputedStyle(heroCopyElement);
             const childrenHeight = heroCopyChildren.reduce(
@@ -128,8 +136,15 @@ export function ShowcaseSection() {
             );
             if (nextHeight === contentHeight) return;
 
+            const isFirstMeasure = contentHeight === 0;
             contentHeight = nextHeight;
             sectionElement.style.setProperty("--showcase-content", `${contentHeight}px`);
+            if (isFirstMeasure) return;
+
+            // 창 크기 변경 시 ScrollTrigger 재계산이 이 측정보다 먼저 끝나면, pin 시작 지점이 이전 높이에 머문다.
+            // 섹션 높이가 바뀌었으니 한 번 더 재계산한다.
+            cancelAnimationFrame(refreshFrame);
+            refreshFrame = requestAnimationFrame(() => ScrollTrigger.refresh());
           };
 
           measureContent();
@@ -159,6 +174,9 @@ export function ShowcaseSection() {
 
           return () => {
             resizeObserver.disconnect();
+            cancelAnimationFrame(refreshFrame);
+            stageElement.style.removeProperty("position");
+            stageElement.style.removeProperty("top");
             sectionElement.style.removeProperty("--showcase-content");
             handoff.scrollTrigger?.kill();
             handoff.kill();
@@ -182,10 +200,7 @@ export function ShowcaseSection() {
       style={sceneStyle}
       aria-labelledby="showcase-title"
     >
-      <div
-        ref={stage}
-        className="relative h-[var(--showcase-height)] overflow-hidden motion-safe:sticky motion-safe:top-[min(0px,calc(100svh-var(--showcase-height)))]"
-      >
+      <div ref={stage} className="relative h-[var(--showcase-height)] overflow-hidden">
         <div
           ref={heroCard}
           className="absolute top-1/2 left-1/2 overflow-hidden bg-[radial-gradient(120%_90%_at_70%_110%,var(--color-teal),var(--color-ink)_70%)] text-white-soft will-change-transform"
