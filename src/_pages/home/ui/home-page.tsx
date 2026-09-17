@@ -4,6 +4,7 @@ import { ServicesSection } from "@/widgets/services";
 import { ServiceTicker } from "@/widgets/service-ticker";
 import { ShowcaseSection } from "@/widgets/showcase";
 import { SiteFooter } from "@/widgets/site-footer";
+import { SiteHeader } from "@/widgets/site-header";
 import { ScrollButton, SmoothScroll } from "@/shared/ui";
 import { SiteLoader } from "./site-loader";
 
@@ -33,6 +34,7 @@ export function HomePage() {
           </main>
         </SmoothScroll>
 
+        <SiteHeader />
         <FloatingActions />
       </div>
     </>
