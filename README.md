@@ -32,9 +32,8 @@ src/
   _pages/home/               # widgets를 조합하는 페이지 slice
   widgets/
     floating-actions/        # 리퀴드 글래스 빠른 메뉴
-    hero/                    # 히어로와 서비스 프리뷰
-    services/                # 실제 서비스 목록
-    service-ticker/          # 서비스명·도메인 ticker
+    site-header/             # 화면 맨 위의 1px 투명 고정 헤더
+    showcase/                # 히어로 카드 → 점 → 파티클 구 → 원통 → 서비스 패널로 이어지는 pinned scene
     more-to-come/            # 마지막 메시지와 CTA pinned scene
     site-footer/             # 전역 푸터
   entities/service/          # 서비스 타입과 실제 서비스 데이터

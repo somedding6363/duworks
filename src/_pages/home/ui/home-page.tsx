@@ -1,7 +1,5 @@
 import { FloatingActions } from "@/widgets/floating-actions";
 import { MoreToComeSection } from "@/widgets/more-to-come";
-import { ServicesSection } from "@/widgets/services";
-import { ServiceTicker } from "@/widgets/service-ticker";
 import { ShowcaseSection } from "@/widgets/showcase";
 import { SiteFooter } from "@/widgets/site-footer";
 import { SiteHeader } from "@/widgets/site-header";
@@ -26,8 +24,6 @@ export function HomePage() {
           <main id="top" className="w-full max-w-full overflow-x-clip">
             <div id="content" tabIndex={-1}>
               <ShowcaseSection />
-              <ServiceTicker />
-              <ServicesSection />
               <MoreToComeSection />
             </div>
             <SiteFooter />
