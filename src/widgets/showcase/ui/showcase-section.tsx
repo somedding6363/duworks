@@ -16,7 +16,7 @@ const scaleBleed = 4;
 // → 원통이 흐르며 서비스가 하나씩 떠오르는 구간 → 마지막 서비스에서 머무는 구간.
 const shrinkUnits = 1.4;
 const spreadUnits = 1.2;
-const morphUnits = 1.3;
+const morphUnits = 3.4;
 // 서비스 하나는 등장(점에서 커지며 또렷해짐) → 유지 → 사라짐 → 다음 서비스와의 간격으로 이어진다.
 const serviceGrowUnits = 1.2;
 const serviceHoldUnits = 0.5;
