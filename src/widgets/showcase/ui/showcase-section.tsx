@@ -328,6 +328,21 @@ export function ShowcaseSection() {
             );
           });
 
+          // 다른 섹션의 "서비스 보기" 버튼이 첫 서비스가 완전히 보이는 위치로 이동할 수 있게, 그 위치를 끝으로 둔 트리거를 둔다.
+          const firstServiceShown = morphEnd + serviceGapUnits + serviceGrowUnits;
+          const servicesEntry = ScrollTrigger.create({
+            id: "showcase-services",
+            trigger: stageElement,
+            start: () => handoff.scrollTrigger?.start ?? 0,
+            end: () => {
+              const trigger = handoff.scrollTrigger;
+              if (!trigger) return 0;
+              return (
+                trigger.start + ((trigger.end - trigger.start) * firstServiceShown) / totalUnits
+              );
+            },
+          });
+
           // 머무는 구간까지 포함해 타임라인 길이를 스크롤 거리(CSS)와 같은 비율로 맞춘다.
           handoff.to({}, { duration: 0 }, totalUnits);
           handoff.eventCallback("onUpdate", () => {
@@ -339,6 +354,7 @@ export function ShowcaseSection() {
 
           return () => {
             visibility.kill();
+            servicesEntry.kill();
             canvasObserver.disconnect();
             particlesView?.destroy();
             resizeObserver.disconnect();

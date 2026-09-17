@@ -41,13 +41,14 @@ test("scrolls service expansion to its actual boundary after scrolling stops", (
   );
 });
 
-test("targets the completed service grid from the More to Come action", () => {
-  const servicesMotionSource = read("src/widgets/services/ui/services-section.tsx");
+test("targets the first showcase service from the More to Come action", () => {
+  const showcaseSource = read("src/widgets/showcase/ui/showcase-section.tsx");
   const moreToComeSource = read("src/widgets/more-to-come/ui/more-to-come-section.tsx");
   const scrollButtonSource = read("src/shared/ui/scroll-button.tsx");
 
-  assert.match(servicesMotionSource, /id: "services-expansion"/);
-  assert.match(moreToComeSource, /scrollTriggerId="services-expansion"/);
+  assert.match(showcaseSource, /id: "showcase-services"/);
+  assert.match(moreToComeSource, /targetId="showcase"/);
+  assert.match(moreToComeSource, /scrollTriggerId="showcase-services"/);
   assert.match(scrollButtonSource, /ScrollTrigger\.getById\(scrollTriggerId\)/);
   assert.match(scrollButtonSource, /scrollTrigger\.scroll\(scrollPosition\)/);
 });
