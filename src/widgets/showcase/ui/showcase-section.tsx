@@ -423,9 +423,9 @@ export function ShowcaseSection() {
           aria-hidden="true"
         />
 
-        {/* 원통 위에 하나씩 떠오르는 서비스 카드. */}
+        {/* 원통 위에 하나씩 떠오르는 서비스 카드. 모션을 줄인 환경에서는 아래의 정적 목록을 쓴다. */}
         <div
-          className="absolute top-1/2 left-1/2 [--service-h:calc(var(--service-w)*4/3)] md:[--service-h:calc(var(--service-w)*4/5)]"
+          className="absolute top-1/2 left-1/2 [--service-h:calc(var(--service-w)*4/3)] motion-reduce:hidden md:[--service-h:calc(var(--service-w)*4/5)]"
           style={serviceStackStyle}
         >
           {liveServices.map((service, index) => (
@@ -440,6 +440,18 @@ export function ShowcaseSection() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* 모션을 줄인 환경에서 서비스를 보여주는 정적 목록. 모션이 켜진 환경에서는 화면과 접근성 트리에서 모두 빠진다. */}
+      <div className="hidden motion-reduce:block">
+        <h2 className="sr-only">서비스</h2>
+        <ul className="mx-auto grid w-[min(90vw,40rem)] gap-6 py-[clamp(3rem,8vw,6rem)]">
+          {liveServices.map((service, index) => (
+            <li key={service.host} className="aspect-[3/4] md:aspect-[5/4]">
+              <ShowcaseServiceCard index={index} service={service} />
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
