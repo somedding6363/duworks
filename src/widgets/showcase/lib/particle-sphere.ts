@@ -37,9 +37,12 @@ vec3 rotateX(vec3 p, float angle) {
 }
 
 void main() {
+  // 구와 원통이 같은 속도로 천천히 돈다.
+  float rotationSpeed = 0.055;
+
   // 가운데 점에서 바깥으로 고르게 퍼진다. 입자마다 퍼지는 때를 조금씩 다르게 둔다.
   float spread = smoothstep(aSeed * 0.3, aSeed * 0.3 + 0.7, uSpread);
-  vec3 sphere = rotateX(rotateY(aSphere * spread, uTime * 0.07), 0.35);
+  vec3 sphere = rotateX(rotateY(aSphere * spread, uTime * rotationSpeed), 0.35);
   // 찌그러지지 않게 세 방향을 같은 비율로 키운다. 가로 폭을 화면의 90%에 맞추되,
   // 넓은 화면에서 위아래가 넘치지 않도록 높이 기준도 함께 본다. 울퉁불퉁한 부분이 튀어나오므로 85%로 잡는다.
   // 카메라 거리 3.4, 초점 1.9에서 반지름 R인 구의 외곽이 화면 좌표 T가 되는 R = T * 3.4 / sqrt(1.9² + T²).
@@ -55,8 +58,8 @@ void main() {
   float height = 1.7;
   vec3 cylinder = aCylinder;
   // 서비스 한 칸마다 점들이 위로 흐르며 돈다. 맨 위를 넘으면 아래에서 다시 나온다.
-  cylinder.y = mod(cylinder.y + uFlow * 0.9 + height, height * 2.0) - height;
-  cylinder = rotateY(cylinder, uTime * 0.15 + uFlow * 0.6);
+  cylinder.y = mod(cylinder.y + uFlow * 0.45 + height, height * 2.0) - height;
+  cylinder = rotateY(cylinder, uTime * rotationSpeed + uFlow * 0.3);
   cylinder.xz *= radiusScale;
 
   // 입자마다 조금씩 다른 때에 원통 자리로 옮겨 간다.
