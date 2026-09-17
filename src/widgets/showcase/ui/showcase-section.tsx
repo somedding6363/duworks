@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
+import { liveServices } from "@/entities/service";
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { createParticleSphere } from "../lib/particle-sphere";
+import { ShowcaseServiceCard } from "./showcase-service-card";
 
 const WORDMARK = "DUWORKS";
 // iOS는 JS로 오는 스크롤 이벤트가 불규칙해 카드가 뚝뚝 따라가므로, 터치에서는 추종을 조금 늦춰 부드럽게 잇는다.
@@ -10,12 +12,28 @@ const touchScrubDuration = 0.3;
 const heroCopyMinGap = 48;
 const scaleBleed = 4;
 // 타임라인 길이 단위. 스크롤 거리도 같은 비율(1단위 = max(100svh, 643px))로 CSS에서 만든다.
-// 카드가 점으로 줄어드는 구간 → 점이 울퉁불퉁한 구로 퍼지는 구간 → 구가 울퉁불퉁한 원통으로 바뀌는 구간 → 머무는 구간.
+// 카드가 점으로 줄어드는 구간 → 점이 울퉁불퉁한 구로 퍼지는 구간 → 구가 울퉁불퉁한 원통으로 바뀌는 구간
+// → 원통이 흐르며 서비스가 하나씩 떠오르는 구간 → 마지막 서비스에서 머무는 구간.
 const shrinkUnits = 1.4;
 const spreadUnits = 1.2;
 const morphUnits = 1.3;
+// 서비스 하나는 등장(점에서 커지며 또렷해짐) → 유지 → 사라짐 → 다음 서비스와의 간격으로 이어진다.
+const serviceGrowUnits = 1.2;
+const serviceHoldUnits = 0.5;
+const serviceGapUnits = 0.1;
+const serviceUnits = serviceGrowUnits * 2 + serviceHoldUnits + serviceGapUnits;
 const holdUnits = 0.4;
-const totalUnits = shrinkUnits + spreadUnits + morphUnits + holdUnits;
+const serviceCount = liveServices.length;
+// 마지막 서비스는 사라지지 않고, 유지 구간 뒤에 머무는 구간(holdUnits)까지 이어진다.
+const totalUnits =
+  shrinkUnits +
+  spreadUnits +
+  morphUnits +
+  serviceUnits * (serviceCount - 1) +
+  serviceGapUnits +
+  serviceGrowUnits +
+  serviceHoldUnits +
+  holdUnits;
 // 카드가 줄어들어 끝나는 점의 지름(px).
 const dotSize = 10;
 // 폰은 점 개수와 해상도를 낮춰 부담을 줄인다.
@@ -57,6 +75,22 @@ const heroCardStyle = {
 // 점이 되어 갈 때 카드 색 대신 파티클과 같은 청록으로 채운다.
 const dotFillStyle = {
   opacity: "clamp(0, (var(--p) - 0.8) * 5, 1)",
+} as CSSProperties;
+
+// 서비스는 점이 모인 자리(보이는 화면 가운데)에 크게 둔다. 폰은 세로로 긴 3:4, 넓은 화면은 5:4다(--service-h는 클래스에서 정한다).
+// 낮은 화면에서도 줄이지 않고, 화면보다 크면 떠 있는 동안 스크롤에 맞춰 위로 올려(--pan: 0 → 1) 위부터 아래까지 보여준다.
+const serviceStackStyle = {
+  "--service-w": "min(90vw, 40rem)",
+  "--service-overflow": "max(0px, var(--service-h) - 100svh + 3rem)",
+  width: "var(--service-w)",
+  height: "var(--service-h)",
+  translate: "-50% calc(-50% + var(--landing-y))",
+} as CSSProperties;
+
+// 카드마다 따로 위로 올린다. 크기 애니메이션(scale)과 섞이지 않게 카드 안쪽 요소가 맡는다.
+const servicePanStyle = {
+  "--pan": 0,
+  translate: "0 calc((0.5 - var(--pan)) * var(--service-overflow))",
 } as CSSProperties;
 
 // 카드 안의 글자는 카드 배율의 역수로 되돌려 찌그러지지 않게 한다.
@@ -209,8 +243,10 @@ export function ShowcaseSection() {
 
           const shrinkEnd = shrinkUnits;
           const spreadEnd = shrinkEnd + spreadUnits;
+          const morphEnd = spreadEnd + morphUnits;
           const particles = { spread: 0, morph: 0, flow: 0 };
           const syncParticles = () => particlesView?.setProgress({ ...particles });
+          const serviceCards = gsap.utils.toArray<HTMLElement>("[data-showcase-service]");
 
           // 1. hero 카드가 회전하며 줄어들어 점이 된다.
           handoff
@@ -238,6 +274,59 @@ export function ShowcaseSection() {
                 spreadEnd,
               );
           }
+
+          // 4. 원통이 흐르는 동안, 그 위에 서비스 카드가 하나씩 떠오른다.
+          handoff.to(
+            particles,
+            {
+              flow: serviceCount,
+              // 타임라인이 스크롤 거리보다 길어지지 않도록 원통 완성부터 끝까지만 흐른다.
+              duration: totalUnits - morphEnd,
+              onUpdate: syncParticles,
+            },
+            morphEnd,
+          );
+          // 카드는 투명한 점 크기에서 커지며 점점 또렷해지고, 다음 서비스로 넘어갈 때 다시 작아지며 사라진다.
+          // 가로·세로를 같은 비율로 키워 카드 모양과 글자가 찌그러지지 않게 한다.
+          // 카드가 화면보다 크면 보이는 동안 위로 올려 전체를 보여준다.
+          serviceCards.forEach((serviceCard, index) => {
+            const pan = serviceCard.querySelector<HTMLElement>("[data-showcase-service-pan]");
+            if (!pan) return;
+            const dotScale = () => dotSize / serviceCard.offsetWidth;
+            // 원통이 완성된 뒤 간격을 두고 첫 서비스가 등장하고, 이후 서비스 칸마다 이어진다.
+            const center =
+              morphEnd +
+              serviceGapUnits +
+              serviceGrowUnits +
+              serviceHoldUnits / 2 +
+              serviceUnits * index;
+            // 유지 구간이 서비스 칸의 가운데(center)에 오도록 앞뒤로 등장·사라짐을 둔다.
+            const enterStart = center - serviceHoldUnits / 2 - serviceGrowUnits;
+            const isLast = index === serviceCount - 1;
+            const exitStart = isLast ? totalUnits : center + serviceHoldUnits / 2;
+
+            handoff
+              .fromTo(
+                serviceCard,
+                { autoAlpha: 0, scale: dotScale },
+                { autoAlpha: 1, scale: 1, duration: serviceGrowUnits, ease: "power2.inOut" },
+                enterStart,
+              )
+              .fromTo(
+                pan,
+                { "--pan": 0 },
+                { "--pan": 1, duration: exitStart - (enterStart + serviceGrowUnits) },
+                enterStart + serviceGrowUnits,
+              );
+
+            if (isLast) return;
+
+            handoff.to(
+              serviceCard,
+              { autoAlpha: 0, scale: dotScale, duration: serviceGrowUnits, ease: "power2.inOut" },
+              exitStart,
+            );
+          });
 
           // 머무는 구간까지 포함해 타임라인 길이를 스크롤 거리(CSS)와 같은 비율로 맞춘다.
           handoff.to({}, { duration: 0 }, totalUnits);
@@ -317,6 +406,24 @@ export function ShowcaseSection() {
           className="pointer-events-none absolute inset-x-0 bottom-0 h-svh w-full"
           aria-hidden="true"
         />
+
+        {/* 원통 위에 하나씩 떠오르는 서비스 카드. */}
+        <div
+          className="absolute top-1/2 left-1/2 [--service-h:calc(var(--service-w)*4/3)] md:[--service-h:calc(var(--service-w)*4/5)]"
+          style={serviceStackStyle}
+        >
+          {liveServices.map((service, index) => (
+            <div
+              key={service.host}
+              data-showcase-service
+              className="invisible absolute inset-0 opacity-0"
+            >
+              <div data-showcase-service-pan className="h-full" style={servicePanStyle}>
+                <ShowcaseServiceCard index={index} service={service} />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
