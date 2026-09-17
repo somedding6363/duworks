@@ -81,7 +81,8 @@ const dotFillStyle = {
 // 낮은 화면에서도 줄이지 않고, 화면보다 크면 떠 있는 동안 스크롤에 맞춰 위로 올려(--pan: 0 → 1) 위부터 아래까지 보여준다.
 const serviceStackStyle = {
   "--service-w": "min(90vw, 40rem)",
-  "--service-overflow": "max(0px, var(--service-h) - 100svh + 3rem)",
+  // 화면보다 클 때 위로 올려야 하는 거리. 위 여백 1.5rem, 아래 여백 6rem(오른쪽 아래 빠른 메뉴 자리)을 남긴다.
+  "--service-overflow": "max(0px, var(--service-h) - 100svh + 7.5rem)",
   width: "var(--service-w)",
   height: "var(--service-h)",
   translate: "-50% calc(-50% + var(--landing-y))",
@@ -90,7 +91,10 @@ const serviceStackStyle = {
 // 카드마다 따로 위로 올린다. 크기 애니메이션(scale)과 섞이지 않게 카드 안쪽 요소가 맡는다.
 const servicePanStyle = {
   "--pan": 0,
-  translate: "0 calc((0.5 - var(--pan)) * var(--service-overflow))",
+  // 화면에 들어가면 가운데에 둔다. 넘치면 위 여백 1.5rem에서 시작해 아래 여백 6rem까지 올린다.
+  // 가운데 기준에서 위아래 여백 차이의 절반(2.25rem)만큼 올려야 하므로, 넘칠 때만 그만큼 더한다.
+  translate:
+    "0 calc((0.5 - var(--pan)) * var(--service-overflow) + clamp(-2.25rem, var(--service-overflow) * -1000, 0px))",
 } as CSSProperties;
 
 // 카드 안의 글자는 카드 배율의 역수로 되돌려 찌그러지지 않게 한다.
