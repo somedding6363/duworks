@@ -13,13 +13,14 @@
   --color-line: #d8d4ca;
   --color-acid: #d9ff57;
   --color-cobalt: #5067ef;
+  --color-teal: #14b8a6;
   --color-coral: #ff725e;
   --color-white-soft: #fffef9;
   --color-glass-edge: rgb(255 255 255 / 0.72);
   --color-glass-fill: rgb(255 255 255 / 0.28);
   --color-glass-highlight: rgb(255 255 255 / 0.66);
 
-  --text-hero: clamp(3.25rem, 14vw, 12.75rem);
+  --text-hero: clamp(2.75rem, 11vw, 9.75rem);
   --text-hero--line-height: 0.72;
   --text-hero--letter-spacing: -0.095em;
   --text-hero-note: 0.6875rem;
@@ -37,6 +38,11 @@
   --text-orbit-label-wide: 0.8125rem;
   --text-orbit-label-wide--line-height: 1.4;
   --text-orbit-label-wide--letter-spacing: -0.015em;
+  --text-showcase-card-title: clamp(1.375rem, 2vw, 2.125rem);
+  --text-showcase-card-title--line-height: 1.08;
+  --text-showcase-card-title--letter-spacing: -0.034em;
+  --text-showcase-card-note: 0.5625rem;
+  --text-showcase-card-note--line-height: 1.3;
   --text-ticker: clamp(1.3rem, 3.2vw, 2.4rem);
   --text-ticker--line-height: 1.5;
   --text-ticker--letter-spacing: -0.035em;
