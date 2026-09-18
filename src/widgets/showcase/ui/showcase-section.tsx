@@ -356,7 +356,18 @@ export function ShowcaseSection() {
             updateActive();
           });
 
+          // ScrollTrigger는 refresh 중 타임라인을 suppressEvents로 적용해 위 onUpdate와 파티클 트윈의
+          // onUpdate를 모두 건너뛴다. 이미 스크롤된 위치에서 새로고침하면 카드 상태만 맞고 진행도는 0에 머물러
+          // 화면이 비어 보이므로, 적용이 끝난 뒤 타임라인의 현재 상태를 직접 파티클에 넘긴다.
+          const syncAfterRefresh = () => {
+            particlesStarted = handoff.time() >= shrinkEnd;
+            syncParticles();
+            updateActive();
+          };
+          ScrollTrigger.addEventListener("refresh", syncAfterRefresh);
+
           return () => {
+            ScrollTrigger.removeEventListener("refresh", syncAfterRefresh);
             visibility.kill();
             servicesEntry.kill();
             canvasObserver.disconnect();
