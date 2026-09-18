@@ -3,7 +3,7 @@
 import { useRef, type CSSProperties } from "react";
 import { liveServices } from "@/entities/service";
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
-import { createParticleSphere } from "../lib/particle-sphere";
+import { createParticleStream } from "../lib/particle-stream";
 import { ShowcaseServiceCard } from "./showcase-service-card";
 
 const WORDMARK = "DUWORKS";
@@ -12,11 +12,11 @@ const touchScrubDuration = 0.3;
 const heroCopyMinGap = 48;
 const scaleBleed = 4;
 // 타임라인 길이 단위. 스크롤 거리도 같은 비율(1단위 = max(100svh, 643px))로 CSS에서 만든다.
-// 카드가 점으로 줄어드는 구간 → 점이 울퉁불퉁한 구로 퍼지는 구간 → 구가 울퉁불퉁한 원통으로 바뀌는 구간
-// → 원통이 흐르며 서비스가 하나씩 떠오르는 구간 → 마지막 서비스에서 머무는 구간.
+// 카드가 점으로 줄어드는 구간 → 점에서 파티클이 퍼지는 구간 → 파티클이 화면 앞으로 다가오는 흐름이 되는 구간
+// → 흐름 위로 서비스가 하나씩 떠오르는 구간 → 마지막 서비스에서 머무는 구간.
 const shrinkUnits = 1.4;
 const spreadUnits = 1.2;
-const morphUnits = 3.4;
+const approachUnits = 3.4;
 // 서비스 하나는 등장(점에서 커지며 또렷해짐) → 유지 → 사라짐 → 다음 서비스와의 간격으로 이어진다.
 const serviceGrowUnits = 1.2;
 const serviceHoldUnits = 0.5;
@@ -28,7 +28,7 @@ const serviceCount = liveServices.length;
 const totalUnits =
   shrinkUnits +
   spreadUnits +
-  morphUnits +
+  approachUnits +
   serviceUnits * (serviceCount - 1) +
   serviceGapUnits +
   serviceGrowUnits +
@@ -201,7 +201,7 @@ export function ShowcaseSection() {
           heroCopyChildren.forEach((child) => resizeObserver.observe(child));
 
           const isTouch = ScrollTrigger.isTouch === 1;
-          const particlesView = createParticleSphere(
+          const particlesView = createParticleStream(
             canvasElement,
             isTouch ? particleCount.touch : particleCount.desktop,
             isTouch ? 1.5 : 2,
@@ -247,8 +247,8 @@ export function ShowcaseSection() {
 
           const shrinkEnd = shrinkUnits;
           const spreadEnd = shrinkEnd + spreadUnits;
-          const morphEnd = spreadEnd + morphUnits;
-          const particles = { spread: 0, morph: 0, flow: 0 };
+          const approachEnd = spreadEnd + approachUnits;
+          const particles = { spread: 0, approach: 0, flow: 0 };
           const syncParticles = () => particlesView?.setProgress({ ...particles });
           const serviceCards = gsap.utils.toArray<HTMLElement>("[data-showcase-service]");
 
@@ -262,7 +262,7 @@ export function ShowcaseSection() {
             )
             .to(heroCopyElement, { autoAlpha: 0, duration: 0.3 * shrinkUnits }, 0.05 * shrinkUnits);
 
-          // 2. 점이 사라지는 자리에서 파티클이 울퉁불퉁한 구로 고르게 퍼진다. WebGL을 못 쓰면 점으로 남는다.
+          // 2. 점이 사라지는 자리에서 파티클이 물결치듯 퍼진다. WebGL을 못 쓰면 점으로 남는다.
           if (particlesView) {
             handoff
               .to(cardElement, { autoAlpha: 0, duration: 0.1 * spreadUnits }, shrinkEnd)
@@ -271,24 +271,24 @@ export function ShowcaseSection() {
                 { spread: 1, duration: spreadUnits, onUpdate: syncParticles },
                 shrinkEnd,
               )
-              // 3. 구가 세로로 긴 울퉁불퉁한 원통으로 바뀐다.
+              // 3. 퍼진 파티클이 화면 앞으로 다가오는 흐름이 된다.
               .to(
                 particles,
-                { morph: 1, duration: morphUnits, onUpdate: syncParticles },
+                { approach: 1, duration: approachUnits, onUpdate: syncParticles },
                 spreadEnd,
               );
           }
 
-          // 4. 원통이 흐르는 동안, 그 위에 서비스 카드가 하나씩 떠오른다.
+          // 4. 흐름이 이어지는 동안, 그 위에 서비스 패널이 하나씩 떠오른다.
           handoff.to(
             particles,
             {
               flow: serviceCount,
-              // 타임라인이 스크롤 거리보다 길어지지 않도록 원통 완성부터 끝까지만 흐른다.
-              duration: totalUnits - morphEnd,
+              // 타임라인이 스크롤 거리보다 길어지지 않도록 흐름이 만들어진 뒤부터 끝까지만 흐른다.
+              duration: totalUnits - approachEnd,
               onUpdate: syncParticles,
             },
-            morphEnd,
+            approachEnd,
           );
           // 카드는 투명한 점 크기에서 커지며 점점 또렷해지고, 다음 서비스로 넘어갈 때 다시 작아지며 사라진다.
           // 가로·세로를 같은 비율로 키워 카드 모양과 글자가 찌그러지지 않게 한다.
@@ -297,9 +297,9 @@ export function ShowcaseSection() {
             const pan = serviceCard.querySelector<HTMLElement>("[data-showcase-service-pan]");
             if (!pan) return;
             const dotScale = () => dotSize / serviceCard.offsetWidth;
-            // 원통이 완성된 뒤 간격을 두고 첫 서비스가 등장하고, 이후 서비스 칸마다 이어진다.
+            // 흐름이 만들어진 뒤 간격을 두고 첫 서비스가 등장하고, 이후 서비스 칸마다 이어진다.
             const center =
-              morphEnd +
+              approachEnd +
               serviceGapUnits +
               serviceGrowUnits +
               serviceHoldUnits / 2 +
@@ -333,7 +333,7 @@ export function ShowcaseSection() {
           });
 
           // 다른 섹션의 "서비스 보기" 버튼이 첫 서비스가 완전히 보이는 위치로 이동할 수 있게, 그 위치를 끝으로 둔 트리거를 둔다.
-          const firstServiceShown = morphEnd + serviceGapUnits + serviceGrowUnits;
+          const firstServiceShown = approachEnd + serviceGapUnits + serviceGrowUnits;
           const servicesEntry = ScrollTrigger.create({
             id: "showcase-services",
             trigger: stageElement,
@@ -420,14 +420,14 @@ export function ShowcaseSection() {
           />
         </div>
 
-        {/* 점이 퍼져 구와 원통이 되는 파티클. pin 중에 보이는 화면(stage 하단)을 채운다. */}
+        {/* 점이 퍼졌다가 화면 앞으로 다가오는 파티클. pin 중에 보이는 화면(stage 하단)을 채운다. */}
         <canvas
           ref={canvas}
           className="pointer-events-none absolute inset-x-0 bottom-0 h-svh w-full"
           aria-hidden="true"
         />
 
-        {/* 원통 위에 하나씩 떠오르는 서비스 카드. 모션을 줄인 환경에서는 아래의 정적 목록을 쓴다. */}
+        {/* 흐름 위에 하나씩 떠오르는 서비스 패널. 모션을 줄인 환경에서는 아래의 정적 목록을 쓴다. */}
         <div
           className="absolute top-1/2 left-1/2 [--service-h:calc(var(--service-w)*4/3)] motion-reduce:hidden md:[--service-h:calc(var(--service-w)*4/5)]"
           style={serviceStackStyle}
