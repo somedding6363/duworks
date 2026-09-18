@@ -6,11 +6,7 @@ export function SiteFooter() {
   return (
     <footer className="bg-paper py-12">
       <div className="page-shell">
-        <Image
-          src={BrandHorizontalLogo}
-          alt="DUWORKS"
-          className="h-8 w-auto invert"
-        />
+        <Image src={BrandHorizontalLogo} alt="DUWORKS" className="h-8 w-auto invert" />
 
         <nav aria-label="DUWORKS 서비스 도메인" className="mt-4 flex flex-col items-start gap-2">
           {liveServices.map((service) => (
