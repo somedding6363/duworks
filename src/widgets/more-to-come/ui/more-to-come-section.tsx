@@ -93,10 +93,18 @@ export function MoreToComeSection() {
 
         const world = stageElement.querySelector<HTMLElement>("[data-finale-world]");
         const title = stageElement.querySelector<HTMLElement>("[data-finale-title]");
+        const supporting = stageElement.querySelector<HTMLElement>("[data-finale-supporting]");
         const supportingCopy = stageElement.querySelector<HTMLElement>("[data-finale-copy]");
         const supportingActions = stageElement.querySelector<HTMLElement>("[data-finale-actions]");
         const items = gsap.utils.toArray<HTMLElement>("[data-finale-item]", stageElement);
-        if (!world || !title || !supportingCopy || !supportingActions) return;
+        if (!world || !title || !supporting || !supportingCopy || !supportingActions) return;
+
+        const getFinalePan = () => {
+          const visibleHeight = Math.min(stageElement.clientHeight, window.innerHeight);
+          const supportingBottom = supporting.offsetTop + supporting.offsetHeight;
+
+          return Math.max(0, supportingBottom - visibleHeight + 24);
+        };
 
         gsap.set(stageElement, {
           perspective: scenePerspective,
@@ -144,6 +152,11 @@ export function MoreToComeSection() {
             0.72,
           )
           // 모든 부유 요소가 사라진 뒤에는 문구만 잠시 남긴다.
+          .to(
+            [title, supporting],
+            { y: () => -getFinalePan(), duration: 0.24, ease: "power2.inOut" },
+            1.08,
+          )
           .to(supportingCopy, { autoAlpha: 1, y: 0, duration: 0.18, ease: "power2.out" }, 1.14)
           .to(supportingActions, { autoAlpha: 1, y: 0, duration: 0.2, ease: "power2.out" }, 1.22)
           // CTA가 완전히 자리 잡은 상태까지 스크롤 구간을 유지한다.
@@ -169,7 +182,7 @@ export function MoreToComeSection() {
     >
       <div
         ref={stage}
-        className="relative h-svh min-h-[38rem] overflow-hidden bg-ink motion-reduce:h-auto motion-reduce:min-h-[42rem]"
+        className="relative h-svh overflow-hidden bg-ink motion-reduce:h-auto motion-reduce:min-h-[42rem]"
       >
         <div
           data-finale-world
@@ -227,7 +240,7 @@ export function MoreToComeSection() {
 
         <div
           data-finale-supporting
-          className="absolute inset-x-0 bottom-[max(2rem,env(safe-area-inset-bottom))] z-[2] mx-auto w-[min(36rem,calc(100%_-_2.5rem))] motion-reduce:opacity-100"
+          className="absolute inset-x-0 top-[calc(min(50%,50svh)+clamp(7rem,12vw,12.5rem)+2rem)] z-[2] mx-auto w-[min(36rem,calc(100%_-_2.5rem))] motion-reduce:opacity-100"
         >
           <p data-finale-copy className="text-center text-more-subtitle text-white-soft/65">
             다음 서비스를 만들고 다듬는 중입니다.
