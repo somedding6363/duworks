@@ -16,7 +16,7 @@ const scaleBleed = 4;
 // → 흐름 위로 서비스가 하나씩 떠오르는 구간 → 마지막 서비스에서 머무는 구간.
 const shrinkUnits = 1.4;
 const spreadUnits = 1.2;
-const approachUnits = 3.4;
+const approachUnits = 1.2;
 // 서비스 하나는 등장(점에서 커지며 또렷해짐) → 유지 → 사라짐 → 다음 서비스와의 간격으로 이어진다.
 const serviceGrowUnits = 1.2;
 const serviceHoldUnits = 0.5;
@@ -284,11 +284,11 @@ export function ShowcaseSection() {
             particles,
             {
               flow: serviceCount,
-              // 타임라인이 스크롤 거리보다 길어지지 않도록 흐름이 만들어진 뒤부터 끝까지만 흐른다.
-              duration: totalUnits - approachEnd,
+              // 퍼짐이 끝나는 즉시 스크롤이 앞뒤 움직임을 만들도록, 다가옴 구간부터 끝까지 이어진다.
+              duration: totalUnits - spreadEnd,
               onUpdate: syncParticles,
             },
-            approachEnd,
+            spreadEnd,
           );
           // 카드는 투명한 점 크기에서 커지며 점점 또렷해지고, 다음 서비스로 넘어갈 때 다시 작아지며 사라진다.
           // 가로·세로를 같은 비율로 키워 카드 모양과 글자가 찌그러지지 않게 한다.
