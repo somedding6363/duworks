@@ -1,12 +1,6 @@
 import Image from "next/image";
-import type { Service } from "@/entities/service";
+import { imagePositionClasses, type Service } from "@/entities/service";
 import { ArrowUpRightIcon } from "@/shared/icons";
-
-const imagePositionClasses = {
-  center: "object-center",
-  "left-top": "object-[left_top]",
-  top: "object-top",
-} as const;
 
 type ShowcaseServiceCardProps = {
   index: number;

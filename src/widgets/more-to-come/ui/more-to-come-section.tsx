@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef } from "react";
-import { liveServices } from "@/entities/service";
+import { imagePositionClasses, liveServices } from "@/entities/service";
 import { ArrowUpIcon, ArrowUpRightIcon } from "@/shared/icons";
 import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { ScrollButton } from "@/shared/ui";
@@ -71,12 +71,6 @@ const flyItems: FlyItem[] = [
     width: "auto",
   },
 ];
-
-const imagePositionClasses = {
-  center: "object-center",
-  "left-top": "object-[left_top]",
-  top: "object-top",
-} as const;
 
 export function MoreToComeSection() {
   const section = useRef<HTMLElement>(null);
