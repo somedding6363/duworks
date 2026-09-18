@@ -269,8 +269,8 @@ export function MoreToComeSection() {
             className="mx-auto mt-10 grid w-full max-w-xl grid-cols-2 border-y border-line opacity-0 motion-reduce:opacity-100 [@media(max-height:40rem)]:mt-6 [@media(max-height:22rem)]:mt-2"
           >
             <ScrollButton
-              targetId="services"
-              scrollTriggerId="services-expansion"
+              targetId="showcase"
+              scrollTriggerId="showcase-services"
               className="group flex min-h-16 cursor-pointer items-center justify-between px-4 text-interface text-ink transition-colors duration-300 hover:bg-panel sm:px-6 [@media(max-height:22rem)]:min-h-11"
             >
               서비스 보기

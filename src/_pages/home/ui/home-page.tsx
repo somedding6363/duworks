@@ -1,9 +1,8 @@
 import { FloatingActions } from "@/widgets/floating-actions";
-import { HeroSection } from "@/widgets/hero";
 import { MoreToComeSection } from "@/widgets/more-to-come";
-import { ServicesSection } from "@/widgets/services";
-import { ServiceTicker } from "@/widgets/service-ticker";
+import { ShowcaseSection } from "@/widgets/showcase";
 import { SiteFooter } from "@/widgets/site-footer";
+import { SiteHeader } from "@/widgets/site-header";
 import { ScrollButton, SmoothScroll } from "@/shared/ui";
 import { SiteLoader } from "./site-loader";
 
@@ -24,15 +23,14 @@ export function HomePage() {
         <SmoothScroll>
           <main id="top" className="w-full max-w-full overflow-x-clip">
             <div id="content" tabIndex={-1}>
-              <HeroSection />
-              <ServiceTicker />
-              <ServicesSection />
+              <ShowcaseSection />
               <MoreToComeSection />
             </div>
             <SiteFooter />
           </main>
         </SmoothScroll>
 
+        <SiteHeader />
         <FloatingActions />
       </div>
     </>
