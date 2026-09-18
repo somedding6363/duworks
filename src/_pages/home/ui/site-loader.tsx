@@ -8,36 +8,8 @@ const COMPLETION_TIME = 380;
 const COMPLETION_HOLD_TIME = 240;
 const EXIT_TIME = 820;
 const WORDMARK = "DUWORKS";
-const LOADER_STORAGE_KEY = "duworks:site-loader-complete";
-const LOADER_BOOTSTRAP_SCRIPT = `try{if(sessionStorage.getItem("${LOADER_STORAGE_KEY}")==="true")document.currentScript?.parentElement?.setAttribute("hidden","")}catch{}`;
 
-type LoaderPhase = "checking" | "loading" | "exiting" | "complete";
-
-function InlineScript({ html }: { html: string }) {
-  return (
-    <script
-      type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
-      suppressHydrationWarning
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
-}
-
-function hasCompletedSiteLoader() {
-  try {
-    return window.sessionStorage.getItem(LOADER_STORAGE_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
-
-function markSiteLoaderComplete() {
-  try {
-    window.sessionStorage.setItem(LOADER_STORAGE_KEY, "true");
-  } catch {
-    // Storage can be unavailable in privacy-restricted browser contexts.
-  }
-}
+type LoaderPhase = "loading" | "exiting" | "complete";
 
 function setPageInteractionBlocked(blocked: boolean) {
   const pageContent = document.querySelector<HTMLElement>("[data-site-content]");
@@ -63,7 +35,7 @@ function setPageInteractionBlocked(blocked: boolean) {
 
 export function SiteLoader() {
   const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState<LoaderPhase>("checking");
+  const [phase, setPhase] = useState<LoaderPhase>("loading");
 
   useEffect(() => {
     setPageInteractionBlocked(phase === "loading" || phase === "exiting");
@@ -71,13 +43,6 @@ export function SiteLoader() {
   }, [phase]);
 
   useEffect(() => {
-    if (hasCompletedSiteLoader()) {
-      const completedStateTimer = window.setTimeout(() => setPhase("complete"), 0);
-      return () => window.clearTimeout(completedStateTimer);
-    }
-
-    const loadingStateTimer = window.setTimeout(() => setPhase("loading"), 0);
-
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const startedAt = performance.now();
     const minimumVisibleTime = reducedMotion ? 160 : MINIMUM_VISIBLE_TIME;
@@ -124,7 +89,6 @@ export function SiteLoader() {
       setProgress((previousProgress) => Math.max(previousProgress, currentProgress));
 
       if (currentProgress >= 100) {
-        markSiteLoaderComplete();
         finish();
         return;
       }
@@ -138,7 +102,6 @@ export function SiteLoader() {
     return () => {
       window.removeEventListener("load", handlePageLoad);
       window.cancelAnimationFrame(animationFrame);
-      window.clearTimeout(loadingStateTimer);
       window.clearTimeout(holdTimer);
       window.clearTimeout(exitTimer);
     };
@@ -159,7 +122,6 @@ export function SiteLoader() {
           : "translate-y-0"
       }`}
       data-site-loader
-      suppressHydrationWarning
       role="progressbar"
       aria-label="처음 화면 불러오기"
       aria-valuemin={0}
@@ -167,7 +129,6 @@ export function SiteLoader() {
       aria-valuenow={progress}
       aria-valuetext={`${progress}% 완료`}
     >
-      <InlineScript html={LOADER_BOOTSTRAP_SCRIPT} />
       <div className="row-start-2" aria-hidden="true">
         <div className="mb-[clamp(1.5rem,3vw,2.5rem)] flex justify-center overflow-hidden pt-[0.16em] pb-[0.08em] text-[clamp(0.8rem,3.375vw,3.1875rem)] leading-[0.72] font-display tracking-[-0.04em] whitespace-nowrap tabular-nums">
           {Array.from(WORDMARK).map((character, index) => (
