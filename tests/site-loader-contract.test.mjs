@@ -26,18 +26,11 @@ test("ties loader completion to page readiness and restores interaction", () => 
   assert.match(source, /currentProgress >= 100/);
 });
 
-test("shows the loader once per browser tab without a repeat-view flash", () => {
+test("shows the loader on every full page load", () => {
   const source = read("src/_pages/home/ui/site-loader.tsx");
 
-  assert.match(source, /window\.sessionStorage\.getItem\(LOADER_STORAGE_KEY\)/);
-  assert.match(source, /window\.sessionStorage\.setItem\(LOADER_STORAGE_KEY, "true"\)/);
-  assert.match(
-    source,
-    /document\.currentScript\?\.parentElement\?\.setAttribute\("hidden",\s*""\)/,
-  );
-  assert.match(source, /suppressHydrationWarning/);
-  assert.match(source, /typeof window === "undefined" \? "text\/javascript" : "text\/plain"/);
-  assert.doesNotMatch(source, /document\.documentElement\.toggleAttribute/);
-  assert.doesNotMatch(source, /data-site-loader-seen/);
+  assert.match(source, /useState<LoaderPhase>\("loading"\)/);
+  assert.doesNotMatch(source, /sessionStorage/);
   assert.doesNotMatch(source, /localStorage/);
+  assert.doesNotMatch(source, /LOADER_BOOTSTRAP_SCRIPT/);
 });

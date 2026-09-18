@@ -16,13 +16,19 @@ npm run dev
 `src/entities/service/model/service.ts`의 `services` 배열이 서비스의 단일 데이터 원본입니다.
 
 - `name`: 서비스 이름
+- `host`: 표시용 도메인
 - `summary`: 한 문장 소개
-- `status`: `운영 중` 또는 `준비 중`
+- `status`: `운영 중` 또는 `준비 중`. `liveServices`는 `운영 중`만 추려낸 목록이며 화면은 이 목록을 사용합니다
 - `href`: 실제 서비스 URL
+- `image`: `public/images/` 아래 스크린샷 경로
+- `imageAlt`: 스크린샷 대체 텍스트
+- `imagePosition`: 스크린샷을 잘라낼 기준(`center`, `left-top`, `top`)
 
 ## 디자인 토큰
 
-색상, SUIT 타이포그래피 스케일, 섹션 간격, 라운드, 그림자, 이징은 `src/app/globals.css`의 Tailwind `@theme`에 정의되어 있습니다. 컴포넌트에서는 `text-display`, `bg-paper`, `rounded-window`, `ease-fluid`처럼 토큰 기반 유틸리티를 사용합니다.
+색상, SUIT 타이포그래피 스케일, 라운드, 그림자, 이징은 `src/app/globals.css`의 Tailwind `@theme`에 정의되어 있습니다. 컴포넌트에서는 `text-hero`, `bg-paper`, `rounded-control`, `ease-fluid`처럼 토큰 기반 유틸리티를 사용합니다.
+
+`@theme`은 실제로 쓰는 토큰만 둡니다. Tailwind v4는 마크다운을 포함한 프로젝트 파일 전체를 스캔하므로, 문서에 적어 둔 클래스 이름만으로도 사용하지 않는 유틸리티가 생성됩니다.
 
 ## FSD 구조
 
@@ -32,12 +38,12 @@ src/
   _pages/home/               # widgets를 조합하는 페이지 slice
   widgets/
     floating-actions/        # 리퀴드 글래스 빠른 메뉴
-    hero/                    # 히어로와 서비스 프리뷰
-    services/                # 실제 서비스 목록
-    service-ticker/          # 서비스명·도메인 ticker
+    site-header/             # 화면 맨 위의 1px 투명 고정 헤더
+    showcase/                # 히어로 카드 → 점 → 파티클 확산 → 전진 흐름 → 서비스 패널로 이어지는 pinned scene
     more-to-come/            # 마지막 메시지와 CTA pinned scene
     site-footer/             # 전역 푸터
   entities/service/          # 서비스 타입과 실제 서비스 데이터
+  shared/config/             # 사이트 메타데이터와 분석 ID public API
   shared/icons/              # 커스텀 SVG 아이콘과 index.ts public API
   shared/lib/gsap/           # GSAP 초기화 public API
   shared/ui/                 # 재사용 UI public API
@@ -53,9 +59,9 @@ src/
 npm run build
 ```
 
-`next.config.ts`에 `output: "export"`가 설정되어 있어 결과물이 `out/`에 생성됩니다. `out/` 폴더는 Firebase Hosting, Cloudflare Pages, GitHub Pages, S3 같은 정적 호스팅에 배포할 수 있습니다.
+`next.config.ts`에 `output: "export"`가 설정되어 있어 결과물이 `out/`에 생성됩니다.
 
-Firebase Hosting을 선택하면 초기화 시 public directory를 `out`으로 지정하면 됩니다. 실제 프로젝트 연결 전에는 Firebase 설정 파일을 저장소에 고정하지 않습니다.
+배포는 Cloudflare Pages를 사용합니다. `main` 브랜치가 프로덕션, `dev` 브랜치가 프리뷰 배포에 연결되어 있습니다.
 
 ### Cloudflare Pages 보안 헤더
 
@@ -70,8 +76,16 @@ npm run headers:check
 ## 검증
 
 ```bash
+npm run verify
+```
+
+`verify`는 `format:check` → `typecheck` → `lint` → `test`를 차례로 실행하며, `test`가 `build`까지 포함합니다. 개별 실행도 가능합니다.
+
+```bash
+npm run format:check
 npm run typecheck
 npm run lint
 npm run build
 npm run headers:check
+npm test
 ```

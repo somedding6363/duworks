@@ -8,36 +8,8 @@ const COMPLETION_TIME = 380;
 const COMPLETION_HOLD_TIME = 240;
 const EXIT_TIME = 820;
 const WORDMARK = "DUWORKS";
-const LOADER_STORAGE_KEY = "duworks:site-loader-complete";
-const LOADER_BOOTSTRAP_SCRIPT = `try{if(sessionStorage.getItem("${LOADER_STORAGE_KEY}")==="true")document.currentScript?.parentElement?.setAttribute("hidden","")}catch{}`;
 
-type LoaderPhase = "checking" | "loading" | "exiting" | "complete";
-
-function InlineScript({ html }: { html: string }) {
-  return (
-    <script
-      type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
-      suppressHydrationWarning
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
-}
-
-function hasCompletedSiteLoader() {
-  try {
-    return window.sessionStorage.getItem(LOADER_STORAGE_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
-
-function markSiteLoaderComplete() {
-  try {
-    window.sessionStorage.setItem(LOADER_STORAGE_KEY, "true");
-  } catch {
-    // Storage can be unavailable in privacy-restricted browser contexts.
-  }
-}
+type LoaderPhase = "loading" | "exiting" | "complete";
 
 function setPageInteractionBlocked(blocked: boolean) {
   const pageContent = document.querySelector<HTMLElement>("[data-site-content]");
@@ -63,21 +35,16 @@ function setPageInteractionBlocked(blocked: boolean) {
 
 export function SiteLoader() {
   const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState<LoaderPhase>("checking");
+  const [phase, setPhase] = useState<LoaderPhase>("loading");
 
+  // 퇴장 애니메이션이 끝나기를 기다리면 화면이 이미 드러난 뒤에도 스크롤이 막혀 입력이 버려진다.
+  // 로더가 올라가기 시작하는 순간(pointer-events 해제 시점)에 바로 스크롤을 넘겨준다.
   useEffect(() => {
-    setPageInteractionBlocked(phase === "loading" || phase === "exiting");
+    setPageInteractionBlocked(phase === "loading");
     return () => setPageInteractionBlocked(false);
   }, [phase]);
 
   useEffect(() => {
-    if (hasCompletedSiteLoader()) {
-      const completedStateTimer = window.setTimeout(() => setPhase("complete"), 0);
-      return () => window.clearTimeout(completedStateTimer);
-    }
-
-    const loadingStateTimer = window.setTimeout(() => setPhase("loading"), 0);
-
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const startedAt = performance.now();
     const minimumVisibleTime = reducedMotion ? 160 : MINIMUM_VISIBLE_TIME;
@@ -124,7 +91,6 @@ export function SiteLoader() {
       setProgress((previousProgress) => Math.max(previousProgress, currentProgress));
 
       if (currentProgress >= 100) {
-        markSiteLoaderComplete();
         finish();
         return;
       }
@@ -138,7 +104,6 @@ export function SiteLoader() {
     return () => {
       window.removeEventListener("load", handlePageLoad);
       window.cancelAnimationFrame(animationFrame);
-      window.clearTimeout(loadingStateTimer);
       window.clearTimeout(holdTimer);
       window.clearTimeout(exitTimer);
     };
@@ -153,13 +118,12 @@ export function SiteLoader() {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] grid min-h-svh grid-rows-[1fr_auto] overflow-hidden bg-paper pt-[max(1.25rem,env(safe-area-inset-top))] pr-[max(1.25rem,env(safe-area-inset-right))] pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-[max(1.25rem,env(safe-area-inset-left))] text-ink touch-none [contain:paint] transition-[transform,box-shadow] duration-[820ms] ease-fluid will-change-transform md:pt-[max(2rem,env(safe-area-inset-top))] md:pr-[max(2.5rem,env(safe-area-inset-right))] md:pb-[max(2rem,env(safe-area-inset-bottom))] md:pl-[max(2.5rem,env(safe-area-inset-left))] motion-reduce:duration-100 ${
+      className={`fixed inset-0 z-[100] grid min-h-svh grid-rows-[1fr_auto] overflow-hidden bg-ink pt-[max(1.25rem,env(safe-area-inset-top))] pr-[max(1.25rem,env(safe-area-inset-right))] pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-[max(1.25rem,env(safe-area-inset-left))] text-white-soft touch-none [contain:paint] transition-[transform,box-shadow] duration-[820ms] ease-fluid will-change-transform md:pt-[max(2rem,env(safe-area-inset-top))] md:pr-[max(2.5rem,env(safe-area-inset-right))] md:pb-[max(2rem,env(safe-area-inset-bottom))] md:pl-[max(2.5rem,env(safe-area-inset-left))] motion-reduce:duration-100 ${
         phase === "exiting"
-          ? "pointer-events-none -translate-y-full shadow-[0_30px_80px_rgb(23_23_19/0.16)]"
+          ? "pointer-events-none -translate-y-full shadow-[0_30px_80px_rgb(0_0_0/0.45)]"
           : "translate-y-0"
       }`}
       data-site-loader
-      suppressHydrationWarning
       role="progressbar"
       aria-label="처음 화면 불러오기"
       aria-valuemin={0}
@@ -167,7 +131,6 @@ export function SiteLoader() {
       aria-valuenow={progress}
       aria-valuetext={`${progress}% 완료`}
     >
-      <InlineScript html={LOADER_BOOTSTRAP_SCRIPT} />
       <div className="row-start-2" aria-hidden="true">
         <div className="mb-[clamp(1.5rem,3vw,2.5rem)] flex justify-center overflow-hidden pt-[0.16em] pb-[0.08em] text-[clamp(0.8rem,3.375vw,3.1875rem)] leading-[0.72] font-display tracking-[-0.04em] whitespace-nowrap tabular-nums">
           {Array.from(WORDMARK).map((character, index) => (
@@ -181,15 +144,15 @@ export function SiteLoader() {
           ))}
         </div>
 
-        <div className="mb-3 flex items-baseline justify-between gap-8 text-micro text-muted">
+        <div className="mb-3 flex items-baseline justify-between gap-8 text-micro text-white-soft/60">
           <span className="tracking-[0.1em]">LOADING</span>
-          <span className="text-interface tracking-[-0.015em] text-ink tabular-nums">
+          <span className="text-interface tracking-[-0.015em] text-white-soft tabular-nums">
             {String(progress).padStart(3, "0")}%
           </span>
         </div>
-        <div className="h-px overflow-hidden bg-line">
+        <div className="h-px overflow-hidden bg-white-soft/20">
           <div
-            className="h-full w-full origin-left bg-ink will-change-transform"
+            className="h-full w-full origin-left bg-white-soft will-change-transform"
             style={{ transform: `scaleX(${progress / 100})` }}
           />
         </div>

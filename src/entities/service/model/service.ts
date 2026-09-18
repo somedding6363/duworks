@@ -9,6 +9,13 @@ export type Service = {
   summary: string;
 };
 
+// 서비스 스크린샷마다 잘라내는 기준이 달라, imagePosition과 짝을 이루는 클래스를 여기서 한 번만 정한다.
+export const imagePositionClasses: Record<Service["imagePosition"], string> = {
+  center: "object-center",
+  "left-top": "object-[left_top]",
+  top: "object-top",
+};
+
 export const services: Service[] = [
   {
     name: "KUWEB",
