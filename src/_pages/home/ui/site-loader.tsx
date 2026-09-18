@@ -37,8 +37,10 @@ export function SiteLoader() {
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<LoaderPhase>("loading");
 
+  // 퇴장 애니메이션이 끝나기를 기다리면 화면이 이미 드러난 뒤에도 스크롤이 막혀 입력이 버려진다.
+  // 로더가 올라가기 시작하는 순간(pointer-events 해제 시점)에 바로 스크롤을 넘겨준다.
   useEffect(() => {
-    setPageInteractionBlocked(phase === "loading" || phase === "exiting");
+    setPageInteractionBlocked(phase === "loading");
     return () => setPageInteractionBlocked(false);
   }, [phase]);
 
