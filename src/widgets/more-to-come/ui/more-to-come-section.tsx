@@ -11,6 +11,8 @@ const touchScrubDuration = 0.08;
 const scenePerspective = 1100;
 const sceneDepth = 3600;
 const timelineEnd = 1.46;
+// 타임라인이 진행되는 스크롤 거리. 화면 높이(svh)의 배수로, stage 뒤에 이만큼을 더 둔다.
+const finaleUnits = 6;
 
 type FlyItem = {
   depth: number;
@@ -80,89 +82,116 @@ export function MoreToComeSection() {
     () => {
       const media = gsap.matchMedia();
 
-      media.add("(prefers-reduced-motion: no-preference)", () => {
-        const sectionElement = section.current;
-        const stageElement = stage.current;
-        if (!sectionElement || !stageElement) return;
+      // 터치에서는 stage를 CSS sticky로 붙여 둔다. showcase와 같은 이유다. JS pin은 시작점을 지나는
+      // 스크롤 이벤트에서야 stage를 fixed로 바꾸는데, 관성 스크롤은 한 이벤트로 시작점을 훌쩍 넘어간다.
+      // 그러면 이미 위로 올라간 섹션이 뒤늦게 제자리로 끌려 내려와 다시 시작하는 것처럼 보인다.
+      // ScrollSmoother가 켜지는 환경(smooth-scroll.tsx와 같은 조건)에서는 sticky가 동작하지 않으므로 JS pin을 쓴다.
+      media.add(
+        {
+          motion: "(prefers-reduced-motion: no-preference)",
+          smooth: "(hover: hover) and (pointer: fine)",
+        },
+        (context) => {
+          const { motion, smooth } = context.conditions ?? {};
+          if (!motion) return;
 
-        const world = stageElement.querySelector<HTMLElement>("[data-finale-world]");
-        const title = stageElement.querySelector<HTMLElement>("[data-finale-title]");
-        const supporting = stageElement.querySelector<HTMLElement>("[data-finale-supporting]");
-        const supportingCopy = stageElement.querySelector<HTMLElement>("[data-finale-copy]");
-        const supportingActions = stageElement.querySelector<HTMLElement>("[data-finale-actions]");
-        const items = gsap.utils.toArray<HTMLElement>("[data-finale-item]", stageElement);
-        if (!world || !title || !supporting || !supportingCopy || !supportingActions) return;
+          const sectionElement = section.current;
+          const stageElement = stage.current;
+          if (!sectionElement || !stageElement) return;
 
-        const getFinalePan = () => {
-          const visibleHeight = Math.min(stageElement.clientHeight, window.innerHeight);
-          const supportingBottom = supporting.offsetTop + supporting.offsetHeight;
+          // pin 여백 대신 섹션 높이로 스크롤 거리를 만든다. sticky는 부모 content box 안에서만 움직인다.
+          if (!smooth) {
+            stageElement.style.position = "sticky";
+            stageElement.style.top = "0px";
+            sectionElement.style.height = `calc(${finaleUnits + 1} * 100svh)`;
+          }
 
-          return Math.max(0, supportingBottom - visibleHeight + 24);
-        };
+          const world = stageElement.querySelector<HTMLElement>("[data-finale-world]");
+          const title = stageElement.querySelector<HTMLElement>("[data-finale-title]");
+          const supporting = stageElement.querySelector<HTMLElement>("[data-finale-supporting]");
+          const supportingCopy = stageElement.querySelector<HTMLElement>("[data-finale-copy]");
+          const supportingActions =
+            stageElement.querySelector<HTMLElement>("[data-finale-actions]");
+          const items = gsap.utils.toArray<HTMLElement>("[data-finale-item]", stageElement);
+          if (!world || !title || !supporting || !supportingCopy || !supportingActions) return;
 
-        gsap.set(stageElement, {
-          perspective: scenePerspective,
-          perspectiveOrigin: "50% min(50%, 50svh)",
-        });
-        gsap.set(world, { transformStyle: "preserve-3d", z: 0, force3D: true });
-        gsap.set(title, { z: -sceneDepth, force3D: true });
-        gsap.set([supportingCopy, supportingActions], { autoAlpha: 0, y: 28 });
+          const getFinalePan = () => {
+            const visibleHeight = Math.min(stageElement.clientHeight, window.innerHeight);
+            const supportingBottom = supporting.offsetTop + supporting.offsetHeight;
 
-        items.forEach((item, index) => {
-          gsap.set(item, {
-            xPercent: -50,
-            yPercent: -50,
-            z: -flyItems[index].depth * sceneDepth,
-            force3D: true,
+            return Math.max(0, supportingBottom - visibleHeight + 24);
+          };
+
+          gsap.set(stageElement, {
+            perspective: scenePerspective,
+            perspectiveOrigin: "50% min(50%, 50svh)",
           });
-        });
+          gsap.set(world, { transformStyle: "preserve-3d", z: 0, force3D: true });
+          gsap.set(title, { z: -sceneDepth, force3D: true });
+          gsap.set([supportingCopy, supportingActions], { autoAlpha: 0, y: 28 });
 
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionElement,
-            start: "top top",
-            // showcase는 스크롤 거리를 svh로 만든다. 여기서 window.innerHeight를 쓰면 주소창이 접힐 때
-            // 두 섹션의 기준이 어긋나 경계에서 스크롤 위치가 튄다. stage(h-svh)의 높이로 맞춘다.
-            end: () => `+=${Math.round(stageElement.clientHeight * 6)}`,
-            pin: stageElement,
-            pinSpacing: true,
-            anticipatePin: 1,
-            scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
-            invalidateOnRefresh: true,
-          },
-        });
+          items.forEach((item, index) => {
+            gsap.set(item, {
+              xPercent: -50,
+              yPercent: -50,
+              z: -flyItems[index].depth * sceneDepth,
+              force3D: true,
+            });
+          });
 
-        timeline.to(world, { z: sceneDepth, duration: 1, ease: "power1.in" }, 0);
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionElement,
+              start: "top top",
+              // showcase는 스크롤 거리를 svh로 만든다. 여기서 window.innerHeight를 쓰면 주소창이 접힐 때
+              // 두 섹션의 기준이 어긋나 경계에서 스크롤 위치가 튄다. stage(h-svh)의 높이로 맞춘다.
+              end: () => `+=${Math.round(stageElement.clientHeight * finaleUnits)}`,
+              // sticky를 쓰는 터치에서는 거리를 섹션 높이가 이미 만들고 있으므로 pin 여백을 더하지 않는다.
+              pin: smooth ? stageElement : false,
+              pinSpacing: smooth,
+              anticipatePin: 1,
+              scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
+              invalidateOnRefresh: true,
+            },
+          });
 
-        items.forEach((item, index) => {
-          const { depth } = flyItems[index];
-          const fadeAt = Math.min(0.9, depth + 0.06);
-          timeline.to(item, { autoAlpha: 0, duration: 0.07, ease: "none" }, fadeAt);
-        });
+          timeline.to(world, { z: sceneDepth, duration: 1, ease: "power1.in" }, 0);
 
-        timeline
-          .fromTo(
-            title,
-            { filter: "blur(7px)" },
-            { filter: "blur(0px)", duration: 0.28, ease: "none" },
-            0.72,
-          )
-          // 모든 부유 요소가 사라진 뒤에는 문구만 잠시 남긴다.
-          .to(
-            [title, supporting],
-            { y: () => -getFinalePan(), duration: 0.24, ease: "power2.inOut" },
-            1.08,
-          )
-          .to(supportingCopy, { autoAlpha: 1, y: 0, duration: 0.18, ease: "power2.out" }, 1.14)
-          .to(supportingActions, { autoAlpha: 1, y: 0, duration: 0.2, ease: "power2.out" }, 1.22)
-          // CTA가 완전히 자리 잡은 상태까지 스크롤 구간을 유지한다.
-          .to({}, { duration: 0 }, timelineEnd);
+          items.forEach((item, index) => {
+            const { depth } = flyItems[index];
+            const fadeAt = Math.min(0.9, depth + 0.06);
+            timeline.to(item, { autoAlpha: 0, duration: 0.07, ease: "none" }, fadeAt);
+          });
 
-        return () => {
-          timeline.scrollTrigger?.kill();
-          timeline.kill();
-        };
-      });
+          timeline
+            .fromTo(
+              title,
+              { filter: "blur(7px)" },
+              { filter: "blur(0px)", duration: 0.28, ease: "none" },
+              0.72,
+            )
+            // 모든 부유 요소가 사라진 뒤에는 문구만 잠시 남긴다.
+            .to(
+              [title, supporting],
+              { y: () => -getFinalePan(), duration: 0.24, ease: "power2.inOut" },
+              1.08,
+            )
+            .to(supportingCopy, { autoAlpha: 1, y: 0, duration: 0.18, ease: "power2.out" }, 1.14)
+            .to(supportingActions, { autoAlpha: 1, y: 0, duration: 0.2, ease: "power2.out" }, 1.22)
+            // CTA가 완전히 자리 잡은 상태까지 스크롤 구간을 유지한다.
+            .to({}, { duration: 0 }, timelineEnd);
+
+          return () => {
+            timeline.scrollTrigger?.kill();
+            timeline.kill();
+            if (!smooth) {
+              stageElement.style.removeProperty("position");
+              stageElement.style.removeProperty("top");
+              sectionElement.style.removeProperty("height");
+            }
+          };
+        },
+      );
 
       return () => media.revert();
     },
