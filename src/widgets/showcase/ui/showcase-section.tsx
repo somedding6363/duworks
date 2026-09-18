@@ -192,8 +192,6 @@ export function ShowcaseSection() {
 
             // 창 크기 변경 시 ScrollTrigger 재계산이 이 측정보다 먼저 끝나면, pin 시작 지점이 이전 높이에 머문다.
             // 섹션 높이가 바뀌었으니 한 번 더 재계산한다.
-            // 터치에서는 주소창이 접힐 때마다 이 관찰자가 깨어나므로, ignoreMobileResize를 우회하지 않도록 건너뛴다.
-            if (ScrollTrigger.isTouch === 1) return;
             cancelAnimationFrame(refreshFrame);
             refreshFrame = requestAnimationFrame(() => ScrollTrigger.refresh());
           };

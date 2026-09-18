@@ -121,9 +121,7 @@ export function MoreToComeSection() {
           scrollTrigger: {
             trigger: sectionElement,
             start: "top top",
-            // showcase는 스크롤 거리를 svh로 만든다. 여기서 window.innerHeight를 쓰면 주소창이 접힐 때
-            // 두 섹션의 기준이 어긋나 경계에서 스크롤 위치가 튄다. stage(h-svh)의 높이로 맞춘다.
-            end: () => `+=${Math.round(stageElement.clientHeight * 6)}`,
+            end: () => `+=${Math.round(window.innerHeight * 6)}`,
             pin: stageElement,
             pinSpacing: true,
             anticipatePin: 1,
