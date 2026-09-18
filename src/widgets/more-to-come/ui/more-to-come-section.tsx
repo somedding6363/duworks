@@ -124,7 +124,9 @@ export function MoreToComeSection() {
             end: () => `+=${Math.round(window.innerHeight * 6)}`,
             pin: stageElement,
             pinSpacing: true,
-            anticipatePin: 1,
+            // normalizeScroll이 스크롤 위치를 프레임마다 맞춰 주므로 미리 잡을 이유가 없다.
+            // 남겨 두면 고속에서 핀 지점에 닿기도 전에 stage를 당겨 올려 오히려 튄다.
+            anticipatePin: 0,
             scrub: ScrollTrigger.isTouch === 1 ? touchScrubDuration : true,
             invalidateOnRefresh: true,
           },
