@@ -4,17 +4,11 @@
   --font-sans: "SUIT Variable", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 
   --color-paper: #11120f;
-  --color-paper-deep: #0b0c0a;
-  --color-panel: #1b1c18;
   --color-ink: #171713;
   --color-ink-soft: #35352f;
-  --color-ink-faint: #777a72;
   --color-muted: #a7aaa2;
-  --color-line: #34362f;
-  --color-acid: #d9ff57;
   --color-cobalt: #5067ef;
   --color-teal: #14b8a6;
-  --color-coral: #ff725e;
   --color-white-soft: #f2f3ef;
   --color-glass-edge: rgb(255 255 255 / 0.72);
   --color-glass-fill: rgb(255 255 255 / 0.28);
@@ -39,28 +33,10 @@
   --text-showcase-service-summary--line-height: 1.5;
   --text-showcase-service-meta: 0.75rem;
   --text-showcase-service-meta--line-height: 1.3;
-  --text-more: clamp(4.875rem, 13vw, 11.25rem);
-  --text-more--line-height: 0.78;
-  --text-more--letter-spacing: -0.065em;
-  --text-more-compact: clamp(4.25rem, 20vw, 7.5rem);
-  --text-more-compact--line-height: 1.5;
-  --text-more-compact--letter-spacing: 0;
   --text-more-subtitle: 0.875rem;
   --text-more-subtitle--line-height: 1.5;
   --text-more-subtitle--letter-spacing: -0.015em;
-  --text-display: clamp(3rem, 6.6vw, 6.75rem);
-  --text-display--line-height: 0.96;
-  --text-display--letter-spacing: -0.052em;
-  --text-section: clamp(2.45rem, 4.6vw, 4.8rem);
-  --text-section--line-height: 1.02;
-  --text-section--letter-spacing: -0.044em;
-  --text-title: clamp(1.75rem, 2.6vw, 2.75rem);
-  --text-title--line-height: 1.08;
-  --text-title--letter-spacing: -0.034em;
-  --text-body-lg: clamp(1.1rem, 1.45vw, 1.38rem);
-  --text-body-lg--line-height: 1.62;
   --text-body: 1rem;
-  --text-body--line-height: 1.65;
   --text-caption: 0.8125rem;
   --text-caption--line-height: 1.4;
   --text-micro: 0.6875rem;
@@ -70,9 +46,6 @@
   --text-floating-action: 0.5625rem;
   --text-floating-action--line-height: 1;
   --text-floating-action--letter-spacing: 0.01em;
-  --text-footer-brand: 1rem;
-  --text-footer-brand--line-height: 1.5;
-  --text-footer-brand--letter-spacing: -0.035em;
   --text-footer-domain: 0.875rem;
   --text-footer-domain--line-height: 1.5;
   --text-footer-domain--letter-spacing: -0.01em;
@@ -80,32 +53,18 @@
   --font-weight-display: 400;
   --font-weight-hero-note: 400;
   --font-weight-support: 100;
-  --font-weight-utility: 700;
 
-  --spacing-section: clamp(8rem, 15vw, 15rem);
-  --spacing-section-sm: clamp(6rem, 10vw, 10rem);
-
-  --radius-window: 1.75rem;
-  --radius-panel: 1.25rem;
   --radius-control: 999px;
 
-  --shadow-product: 0 40px 100px rgb(0 0 0 / 0.34);
-  --shadow-float: 0 16px 50px rgb(0 0 0 / 0.3);
   --shadow-liquid:
     0 18px 56px rgb(23 23 19 / 0.16), inset 0 1px 0 rgb(255 255 255 / 0.9),
     inset 0 -1px 0 rgb(23 23 19 / 0.06);
 
   --ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-snappy: cubic-bezier(0.2, 0.8, 0.2, 1);
-
-  --breakpoint-xs: 30rem;
-  --breakpoint-wide: 100rem;
 }
 
 :root {
   --page-gutter: clamp(1.25rem, 3.8vw, 4rem);
-  --line-soft: rgb(242 243 239 / 0.12);
-  --line-faint: rgb(242 243 239 / 0.07);
 }
 
 @layer base {
@@ -147,10 +106,6 @@
 @utility page-shell {
   width: min(calc(100% - (var(--page-gutter) * 2)), 86rem);
   margin-inline: auto;
-}
-
-@utility balance {
-  text-wrap: balance;
 }
 
 @utility pretty {
