@@ -3,19 +3,19 @@
 @theme {
   --font-sans: "SUIT Variable", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 
-  --color-paper: #f3f0e8;
-  --color-paper-deep: #e9e4da;
-  --color-panel: #ffffff;
+  --color-paper: #11120f;
+  --color-paper-deep: #0b0c0a;
+  --color-panel: #1b1c18;
   --color-ink: #171713;
   --color-ink-soft: #35352f;
-  --color-ink-faint: #c7c5be;
-  --color-muted: #6c6a62;
-  --color-line: #d8d4ca;
+  --color-ink-faint: #777a72;
+  --color-muted: #a7aaa2;
+  --color-line: #34362f;
   --color-acid: #d9ff57;
   --color-cobalt: #5067ef;
   --color-teal: #14b8a6;
   --color-coral: #ff725e;
-  --color-white-soft: #fffef9;
+  --color-white-soft: #f2f3ef;
   --color-glass-edge: rgb(255 255 255 / 0.72);
   --color-glass-fill: rgb(255 255 255 / 0.28);
   --color-glass-highlight: rgb(255 255 255 / 0.66);
@@ -89,8 +89,8 @@
   --radius-panel: 1.25rem;
   --radius-control: 999px;
 
-  --shadow-product: 0 40px 100px rgb(23 23 19 / 0.12);
-  --shadow-float: 0 16px 50px rgb(23 23 19 / 0.09);
+  --shadow-product: 0 40px 100px rgb(0 0 0 / 0.34);
+  --shadow-float: 0 16px 50px rgb(0 0 0 / 0.3);
   --shadow-liquid:
     0 18px 56px rgb(23 23 19 / 0.16), inset 0 1px 0 rgb(255 255 255 / 0.9),
     inset 0 -1px 0 rgb(23 23 19 / 0.06);
@@ -104,8 +104,8 @@
 
 :root {
   --page-gutter: clamp(1.25rem, 3.8vw, 4rem);
-  --line-soft: rgb(23 23 19 / 0.075);
-  --line-faint: rgb(23 23 19 / 0.045);
+  --line-soft: rgb(242 243 239 / 0.12);
+  --line-faint: rgb(242 243 239 / 0.07);
 }
 
 @layer base {
