@@ -15,7 +15,7 @@ export function HomePage() {
         <ScrollButton
           targetId="content"
           focusTarget
-          className="fixed top-3 left-3 z-[60] -translate-y-24 cursor-pointer rounded-control bg-ink px-5 py-3 text-interface font-bold text-panel transition-transform focus:translate-y-0"
+          className="fixed top-3 left-3 z-[60] -translate-y-24 cursor-pointer rounded-control bg-ink px-5 py-3 text-interface font-bold text-white-soft transition-transform focus:translate-y-0"
         >
           본문으로 바로가기
         </ScrollButton>
