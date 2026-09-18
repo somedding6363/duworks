@@ -384,7 +384,7 @@ export function ShowcaseSection() {
     <section
       ref={section}
       id="showcase"
-      className="relative isolate bg-paper motion-safe:h-[calc(var(--showcase-height)+var(--showcase-distance))]"
+      className="relative isolate bg-ink text-white-soft motion-safe:h-[calc(var(--showcase-height)+var(--showcase-distance))]"
       style={sceneStyle}
       aria-labelledby="showcase-title"
     >

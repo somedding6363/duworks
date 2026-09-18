@@ -89,10 +89,10 @@ void main() {
   float distance = length(offset);
   if (distance > 0.5) discard;
   float soft = 1.0 - smoothstep(0.15, 0.5, distance);
-  // 밝은 크림 배경 위에서 보이도록 청록과 짙은 청록 사이로 칠한다.
+  // 어두운 배경 위에서 빛나도록 청록과 흰빛 사이로 칠한다.
   vec3 teal = vec3(0.078, 0.722, 0.651);
-  vec3 deep = vec3(0.035, 0.29, 0.27);
-  vec3 color = mix(teal, deep, smoothstep(0.35, 0.9, vTone));
+  vec3 glow = vec3(0.86, 0.98, 0.95);
+  vec3 color = mix(teal, glow, smoothstep(0.35, 0.9, vTone));
   gl_FragColor = vec4(color * soft * vAlpha, soft * vAlpha);
 }
 `;
