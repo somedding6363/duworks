@@ -9,7 +9,7 @@ import {
   serviceFanCardTransitionDuration,
   serviceFanCollapsedOpacity,
 } from "@/entities/service";
-import { gsap, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
+import { gsap, ScrollSmoother, ScrollTrigger, useGSAP } from "@/shared/lib/gsap";
 import { ServiceCard } from "./service-card";
 
 const touchScrubDuration = 0.08;
@@ -80,6 +80,7 @@ export function ServicesSection() {
         const links = cards.filter(
           (card): card is HTMLAnchorElement => card instanceof HTMLAnchorElement,
         );
+        let gridExpansionScrollDirection = 0;
         let showingGridFace = true;
         let showingGrid = true;
 
@@ -95,6 +96,33 @@ export function ServicesSection() {
           slots.forEach((slot) => {
             slot.style.visibility = showGridFace ? "visible" : "hidden";
           });
+        };
+
+        const scrollToGridExpansionBoundary = ({
+          direction,
+          end,
+          progress,
+          start,
+        }: ScrollTrigger) => {
+          if (progress <= 0 || progress >= handoffThreshold) {
+            gridExpansionScrollDirection = 0;
+            return;
+          }
+
+          if ((direction !== 1 && direction !== -1) || direction === gridExpansionScrollDirection) {
+            return;
+          }
+
+          gridExpansionScrollDirection = direction;
+          const target = direction === 1 ? end : start;
+          const smoother = ScrollSmoother.get();
+
+          if (smoother) {
+            smoother.scrollTo(target, true);
+            return;
+          }
+
+          window.scrollTo({ top: target, behavior: "smooth" });
         };
 
         const setGridHandoff = (showGrid: boolean) => {
@@ -266,6 +294,7 @@ export function ServicesSection() {
 
         const expansionTimeline = gsap.timeline({
           scrollTrigger: {
+            id: "services-expansion",
             trigger: sectionElement,
             start: "top top",
             end: () => `+=${window.innerHeight * gridExpansionDuration}`,
@@ -294,6 +323,13 @@ export function ServicesSection() {
             },
           },
         });
+
+        const handleGridExpansionScrollEnd = () => {
+          const trigger = expansionTimeline.scrollTrigger;
+          if (trigger) scrollToGridExpansionBoundary(trigger);
+        };
+
+        ScrollTrigger.addEventListener("scrollEnd", handleGridExpansionScrollEnd);
 
         fanCards.forEach((card, index) => {
           expansionTimeline.fromTo(
@@ -375,6 +411,7 @@ export function ServicesSection() {
         }
 
         return () => {
+          ScrollTrigger.removeEventListener("scrollEnd", handleGridExpansionScrollEnd);
           setGridFace(true);
           setGridHandoff(true);
           expansionTimeline.scrollTrigger?.kill();
