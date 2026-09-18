@@ -121,7 +121,7 @@ export function MoreToComeSection() {
           scrollTrigger: {
             trigger: sectionElement,
             start: "top top",
-            end: () => `+=${Math.round(window.innerHeight * 4.2)}`,
+            end: () => `+=${Math.round(window.innerHeight * 6)}`,
             pin: stageElement,
             pinSpacing: true,
             anticipatePin: 1,

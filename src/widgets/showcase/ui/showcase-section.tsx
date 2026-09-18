@@ -14,15 +14,15 @@ const scaleBleed = 4;
 // 타임라인 길이 단위. 스크롤 거리도 같은 비율(1단위 = max(100svh, 643px))로 CSS에서 만든다.
 // 카드가 점으로 줄어드는 구간 → 점에서 파티클이 퍼지는 구간 → 파티클이 화면 앞으로 다가오는 흐름이 되는 구간
 // → 흐름 위로 서비스가 하나씩 떠오르는 구간 → 마지막 서비스에서 머무는 구간.
-const shrinkUnits = 1.4;
-const spreadUnits = 1.2;
-const approachUnits = 1.2;
+const shrinkUnits = 3.2;
+const spreadUnits = 3;
+const approachUnits = 1.6;
 // 서비스 하나는 등장(점에서 커지며 또렷해짐) → 유지 → 사라짐 → 다음 서비스와의 간격으로 이어진다.
-const serviceGrowUnits = 1.2;
-const serviceHoldUnits = 0.5;
-const serviceGapUnits = 0.1;
+const serviceGrowUnits = 1.4;
+const serviceHoldUnits = 1;
+const serviceGapUnits = 0.25;
 const serviceUnits = serviceGrowUnits * 2 + serviceHoldUnits + serviceGapUnits;
-const holdUnits = 0.4;
+const holdUnits = 0.7;
 const serviceCount = liveServices.length;
 // 마지막 서비스는 사라지지 않고, 유지 구간 뒤에 머무는 구간(holdUnits)까지 이어진다.
 const totalUnits =
