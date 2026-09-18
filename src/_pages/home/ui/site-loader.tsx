@@ -153,9 +153,9 @@ export function SiteLoader() {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] grid min-h-svh grid-rows-[1fr_auto] overflow-hidden bg-paper pt-[max(1.25rem,env(safe-area-inset-top))] pr-[max(1.25rem,env(safe-area-inset-right))] pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-[max(1.25rem,env(safe-area-inset-left))] text-ink touch-none [contain:paint] transition-[transform,box-shadow] duration-[820ms] ease-fluid will-change-transform md:pt-[max(2rem,env(safe-area-inset-top))] md:pr-[max(2.5rem,env(safe-area-inset-right))] md:pb-[max(2rem,env(safe-area-inset-bottom))] md:pl-[max(2.5rem,env(safe-area-inset-left))] motion-reduce:duration-100 ${
+      className={`fixed inset-0 z-[100] grid min-h-svh grid-rows-[1fr_auto] overflow-hidden bg-ink pt-[max(1.25rem,env(safe-area-inset-top))] pr-[max(1.25rem,env(safe-area-inset-right))] pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-[max(1.25rem,env(safe-area-inset-left))] text-white-soft touch-none [contain:paint] transition-[transform,box-shadow] duration-[820ms] ease-fluid will-change-transform md:pt-[max(2rem,env(safe-area-inset-top))] md:pr-[max(2.5rem,env(safe-area-inset-right))] md:pb-[max(2rem,env(safe-area-inset-bottom))] md:pl-[max(2.5rem,env(safe-area-inset-left))] motion-reduce:duration-100 ${
         phase === "exiting"
-          ? "pointer-events-none -translate-y-full shadow-[0_30px_80px_rgb(23_23_19/0.16)]"
+          ? "pointer-events-none -translate-y-full shadow-[0_30px_80px_rgb(0_0_0/0.45)]"
           : "translate-y-0"
       }`}
       data-site-loader
@@ -181,15 +181,15 @@ export function SiteLoader() {
           ))}
         </div>
 
-        <div className="mb-3 flex items-baseline justify-between gap-8 text-micro text-muted">
+        <div className="mb-3 flex items-baseline justify-between gap-8 text-micro text-white-soft/60">
           <span className="tracking-[0.1em]">LOADING</span>
-          <span className="text-interface tracking-[-0.015em] text-ink tabular-nums">
+          <span className="text-interface tracking-[-0.015em] text-white-soft tabular-nums">
             {String(progress).padStart(3, "0")}%
           </span>
         </div>
-        <div className="h-px overflow-hidden bg-line">
+        <div className="h-px overflow-hidden bg-white-soft/20">
           <div
-            className="h-full w-full origin-left bg-ink will-change-transform"
+            className="h-full w-full origin-left bg-white-soft will-change-transform"
             style={{ transform: `scaleX(${progress / 100})` }}
           />
         </div>
