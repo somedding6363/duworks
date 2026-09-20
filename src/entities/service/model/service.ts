@@ -47,6 +47,16 @@ export const services: Service[] = [
     imageAlt: "144BPM 리듬 편집 화면",
     imagePosition: "top",
   },
+  {
+    name: "이건 별로 안땡겨",
+    host: "nottoeat.duworks.kr",
+    summary: "먹고 싶지 않은 메뉴를 하나씩 제외하며 오늘의 메뉴를 결정하는 서비스입니다.",
+    status: "운영 중",
+    href: "https://nottoeat.duworks.kr",
+    image: "/images/nottoeat.webp",
+    imageAlt: "이건 별로 안땡겨 메인 화면",
+    imagePosition: "top",
+  },
 ];
 
 export const liveServices = services.filter((service) => service.status === "운영 중");

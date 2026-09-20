@@ -21,56 +21,78 @@ type FlyItem = {
   y: string;
 };
 
-const flyItems: FlyItem[] = [
-  {
-    kind: "domain",
-    serviceIndex: 0,
-    x: "27vw",
-    y: "-27vh",
-    depth: 0.16,
-    width: "auto",
-  },
-  {
-    kind: "image",
-    serviceIndex: 0,
-    x: "-31vw",
-    y: "-15vh",
-    depth: 0.27,
-    width: "clamp(17rem,42vw,46rem)",
-  },
-  {
-    kind: "image",
-    serviceIndex: 1,
-    x: "29vw",
-    y: "15vh",
-    depth: 0.45,
-    width: "clamp(18rem,46vw,50rem)",
-  },
-  {
-    kind: "domain",
-    serviceIndex: 1,
-    x: "-12vw",
-    y: "-31vh",
-    depth: 0.57,
-    width: "auto",
-  },
-  {
-    kind: "image",
-    serviceIndex: 2,
-    x: "-25vw",
-    y: "24vh",
-    depth: 0.7,
-    width: "clamp(19rem,52vw,56rem)",
-  },
-  {
-    kind: "domain",
-    serviceIndex: 2,
-    x: "18vw",
-    y: "29vh",
-    depth: 0.82,
-    width: "auto",
-  },
+type FlyItemLayout = Omit<FlyItem, "depth" | "serviceIndex">;
+
+const flyItemLayouts: FlyItemLayout[][] = [
+  [
+    {
+      kind: "domain",
+      x: "27vw",
+      y: "-27vh",
+      width: "auto",
+    },
+    {
+      kind: "image",
+      x: "-31vw",
+      y: "-15vh",
+      width: "clamp(17rem,42vw,46rem)",
+    },
+  ],
+  [
+    {
+      kind: "image",
+      x: "29vw",
+      y: "15vh",
+      width: "clamp(18rem,46vw,50rem)",
+    },
+    {
+      kind: "domain",
+      x: "-12vw",
+      y: "-31vh",
+      width: "auto",
+    },
+  ],
+  [
+    {
+      kind: "image",
+      x: "-25vw",
+      y: "24vh",
+      width: "clamp(19rem,52vw,56rem)",
+    },
+    {
+      kind: "domain",
+      x: "18vw",
+      y: "29vh",
+      width: "auto",
+    },
+  ],
+  [
+    {
+      kind: "domain",
+      x: "-24vw",
+      y: "8vh",
+      width: "auto",
+    },
+    {
+      kind: "image",
+      x: "25vw",
+      y: "-22vh",
+      width: "clamp(18rem,48vw,52rem)",
+    },
+  ],
 ];
+
+// 서비스 수가 바뀌어도 마지막 장면에서 모든 서비스가 이미지와 도메인으로 한 번씩 지나가게 한다.
+const flyItemsWithoutDepth = liveServices.flatMap((_, serviceIndex) =>
+  flyItemLayouts[serviceIndex % flyItemLayouts.length].map((item) => ({
+    ...item,
+    serviceIndex,
+  })),
+);
+const flyItems: FlyItem[] = flyItemsWithoutDepth.map((item, index) => ({
+  ...item,
+  depth: 0.14 + (index * 0.68) / Math.max(1, flyItemsWithoutDepth.length - 1),
+}));
 
 export function MoreToComeSection() {
   const section = useRef<HTMLElement>(null);
