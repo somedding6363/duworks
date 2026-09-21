@@ -3,7 +3,14 @@ import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
-import { getAttribute, outputRoot, readOutput, readServiceCatalog, root } from "./test-utils.mjs";
+import {
+  getAttribute,
+  outputRoot,
+  read,
+  readOutput,
+  readServiceCatalog,
+  root,
+} from "./test-utils.mjs";
 
 const services = readServiceCatalog();
 
@@ -76,4 +83,11 @@ test("protects every exported service link opened in a new tab", () => {
       assert.equal(rel.has("noreferrer"), true, `${service.name} must use noreferrer.`);
     }
   }
+});
+
+test("builds the finale fly-through from the live service catalog", () => {
+  const source = read("src/widgets/more-to-come/ui/more-to-come-section.tsx");
+
+  assert.match(source, /liveServices\.flatMap\(\(_, serviceIndex\)/);
+  assert.doesNotMatch(source, /serviceIndex:\s*\d/);
 });
