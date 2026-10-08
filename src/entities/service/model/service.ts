@@ -29,10 +29,10 @@ export const services: Service[] = [
   },
   {
     name: "Meongspace",
-    host: "meongspace.duworks.kr",
+    host: "meongspace.com",
     summary: "잠시 쉬고 싶을 때, 가만히 바라보며 머무는 공간입니다.",
     status: "운영 중",
-    href: "https://meongspace.duworks.kr",
+    href: "https://meongspace.com",
     image: "/images/meongspace.webp",
     imageAlt: "Meongspace 메인 화면",
     imagePosition: "center",
