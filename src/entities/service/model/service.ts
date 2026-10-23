@@ -18,16 +18,6 @@ export const imagePositionClasses: Record<Service["imagePosition"], string> = {
 
 export const services: Service[] = [
   {
-    name: "KUWEB",
-    host: "www.kuphil.com",
-    summary: "건국대학교 아마추어 오케스트라 KUphil의 공식 웹사이트입니다.",
-    status: "운영 중",
-    href: "https://www.kuphil.com",
-    image: "/images/kuweb.webp",
-    imageAlt: "KUWEB 메인 화면",
-    imagePosition: "left-top",
-  },
-  {
     name: "Meongspace",
     host: "meongspace.com",
     summary: "잠시 쉬고 싶을 때, 가만히 바라보며 머무는 공간입니다.",
@@ -35,6 +25,16 @@ export const services: Service[] = [
     href: "https://meongspace.com",
     image: "/images/meongspace.webp",
     imageAlt: "Meongspace 메인 화면",
+    imagePosition: "center",
+  },
+  {
+    name: "Todok",
+    host: "todok.duworks.kr",
+    summary: "직접 치며 듣는 키보드 ASMR",
+    status: "운영 중",
+    href: "https://todok.duworks.kr",
+    image: "/images/todok.webp",
+    imageAlt: "Todok 키보드 화면",
     imagePosition: "center",
   },
   {
